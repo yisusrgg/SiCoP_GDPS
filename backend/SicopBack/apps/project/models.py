@@ -1,5 +1,7 @@
 from django.db import models
-
+from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
+from datetime import datetime
 from apps.call.models import call
 from apps.call.models import call 
 from apps.company.models import company 
@@ -22,16 +24,16 @@ class project(models.Model):
       serv = 'SV', ("SERVICIOS")
     
     #clave interna
-    internCode = models.CharField("Calve interna", max_length=15)
+    internCode = models.CharField("Clave interna", max_length=15, blank=True, editable=False)
     
     #Nombre de proyecto
     projectName = models.CharField("Nombre del proyecto", max_length=254)
     
     #Objetivos
-    objetives = models.TextField("Objetivos")
+    objetives = models.TextField("Objetivos", max_length=1000)
     
     #Resumen
-    summary = models.TextField("Resumen")
+    summary = models.TextField("Resumen", max_length=1000)
     
     #Area de Investigacion
     invArea = models.CharField(max_length=50,choices=areaInv.choices,default=areaInv.cienciasN )
@@ -40,13 +42,13 @@ class project(models.Model):
     dateBegin = models.DateField("Fecha de inicio",auto_now=False, auto_now_add=False)
     
     #Fecha terminacion
-    dateEnd = models.DateField("Fecha de inicio",auto_now=False, auto_now_add=False)
+    dateEnd = models.DateField("Fecha de fin",auto_now=False, auto_now_add=False)
     
     #Financiamiento
     financing = models.BooleanField("Financiamiento")
     
     #Monto
-    amount = models.DecimalField("Monto",max_digits=5, decimal_places=2)
+    amount = models.DecimalField("Monto",max_digits=12, decimal_places=2, validators=[MinValueValidator(1000.00)], null=True, blank=True)
     
     #rfc convocatoria
     rfcCall = models.ForeignKey(call,  on_delete=models.CASCADE)
@@ -66,6 +68,21 @@ class project(models.Model):
     #
     projectcol = models.CharField(max_length=50)
     
+    def clean(self):
+        if self.dateBegin and self.dateEnd and self.dateEnd < self.dateBegin:
+            raise ValidationError({'dateEnd': 'La fecha de fin no puede ser anterior a la fecha de inicio.'})
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Llama a clean() antes de guardar
+        if not self.internCode:
+            super().save(*args, **kwargs)
+            year = self.dateBegin.year if self.dateBegin else datetime.now().year
+            year_short = str(year)[-2:]
+            self.internCode = f"itsur-pi-{year_short}-{str(self.id).zfill(2)}"
+            super().save(update_fields=["internCode"])
+        else:
+            super().save(*args, **kwargs)
+        
     def __str__(self):
        return self.projectName  
     

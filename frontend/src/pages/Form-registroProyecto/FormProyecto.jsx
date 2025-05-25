@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import axios from "axios"
+import InputAdornment from "@mui/material/InputAdornment";
 import {
   Box,
   Typography,
@@ -25,7 +26,6 @@ function FormProyecto() {
   const { id } = useParams() // Obtiene el ID del proyecto desde la URL
   const navigate = useNavigate() // Para redirigir al usuario
   const [formData, setFormData] = useState({
-    internCode: "",
     projectName: "",
     objetives: "",
     summary: "",
@@ -87,35 +87,61 @@ function FormProyecto() {
   }, [id])
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    })
-  }
+    const { name, value, type, checked } = e.target;
 
+    if (name === "financing") {
+      setFormData((prev) => ({
+        ...prev,
+        financing: checked,
+        amount: checked ? 1000 : "", // Si se activa, pone 1000; si se desactiva, limpia el campo
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
+  };
+
+  const caracteresValidos = /^[a-zA-Z0-9ÁÉÍÓÚáéíóúÑñüÜ\s]+$/;
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    if (!caracteresValidos.test(formData.projectName)) {
+      alert("El Nombre del Proyecto no debe contener caracteres especiales.");
+      return;
+    }
+
+
+    if (formData.dateBegin && formData.dateEnd && formData.dateEnd < formData.dateBegin) {
+      alert("La fecha de fin no puede ser anterior a la fecha de inicio.");
+      return;
+    }
+
+    let dataToSend = { ...formData };
+    if (!formData.financing) {
+      dataToSend.amount = null; 
+    }
+
     try {
       if (id) {
-        // Si hay un ID, actualiza el proyecto
-        await axios.put(`http://127.0.0.1:8000/projects/projects/${id}/`, formData)
-        alert("Proyecto actualizado exitosamente")
+        // Usa dataToSend aquí
+        await axios.put(`http://127.0.0.1:8000/projects/projects/${id}/`, dataToSend);
+        alert("Proyecto actualizado exitosamente");
       } else {
-        // Si no hay un ID, crea un nuevo proyecto
-        await axios.post("http://127.0.0.1:8000/projects/projects/", formData)
-        alert("Proyecto creado exitosamente")
+        // Usa dataToSend aquí
+        await axios.post("http://127.0.0.1:8000/projects/projects/", dataToSend);
+        alert("Proyecto creado exitosamente");
       }
-      navigate("/Administracion/Proyectos") // Redirige al CRUD
+      navigate("/Administracion/Proyectos");
     } catch (error) {
-      console.error("Error al guardar el proyecto:", error.response || error)
+      console.error("Error al guardar el proyecto:", error.response || error);
       if (error.response && error.response.data) {
-        alert(`Error del backend: ${JSON.stringify(error.response.data)}`)
+        alert(`Error del backend: ${JSON.stringify(error.response.data)}`);
       } else {
-        alert("Error al guardar el proyecto")
+        alert("Error al guardar el proyecto");
       }
     }
-  }
+  };
 
   return (
     <Box>
@@ -132,21 +158,8 @@ function FormProyecto() {
             {id ? "Modifica los datos de la línea de investigación" : "Ingresa los datos de la línea de investigación"}
           </Typography>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <Typography sx={{ minWidth: "200px" }}>Código Interno:</Typography>
-                  <TextField
-                    fullWidth
-                    name="internCode"
-                    value={formData.internCode}
-                    onChange={handleChange}
-                    required
-                    variant="outlined"
-                  />
-                </Box>
-              </Grid>
 
               <Grid item xs={12}>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -158,6 +171,17 @@ function FormProyecto() {
                     onChange={handleChange}
                     required
                     variant="outlined"
+                    inputProps={{ maxLength: 254 }}
+                    helperText=" "
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end" sx={{ ml: 1 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {`${formData.projectName.length}/254`}
+                          </Typography>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Box>
               </Grid>
@@ -174,6 +198,17 @@ function FormProyecto() {
                     multiline
                     rows={4}
                     variant="outlined"
+                    inputProps={{ maxLength: 1000 }}
+                    helperText=" "
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end" sx={{ ml: 1 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {`${formData.objetives.length}/1000`}
+                          </Typography>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Box>
               </Grid>
@@ -190,6 +225,17 @@ function FormProyecto() {
                     multiline
                     rows={4}
                     variant="outlined"
+                    inputProps={{ maxLength: 1000 }}
+                    helperText=" "
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end" sx={{ ml: 1 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {`${formData.objetives.length}/1000`}
+                          </Typography>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Box>
               </Grid>
@@ -243,6 +289,9 @@ function FormProyecto() {
                     required
                     InputLabelProps={{ shrink: true }}
                     variant="outlined"
+                    inputProps={{
+                      min: formData.dateBegin || undefined, // <-- Esto evita seleccionar una fecha menor
+                    }}
                   />
                 </Box>
               </Grid>
@@ -268,6 +317,17 @@ function FormProyecto() {
                     onChange={handleChange}
                     disabled={!formData.financing}
                     variant="outlined"
+                    inputProps={{ min: 1000, max: 99999999 }}
+                    helperText=" "
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end" sx={{ ml: 1 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {`${formData.amount}/99999999`}
+                          </Typography>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Box>
               </Grid>
@@ -361,6 +421,17 @@ function FormProyecto() {
                     value={formData.projectcol}
                     onChange={handleChange}
                     variant="outlined"
+                    inputProps={{ maxLength: 50 }}
+                    helperText=" "
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end" sx={{ ml: 1 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {`${formData.projectcol.length}/50`}
+                          </Typography>
+                        </InputAdornment>
+                      ),
+                    }}    
                   />
                 </Box>
               </Grid>
