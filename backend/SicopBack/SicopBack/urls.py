@@ -20,13 +20,18 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('usuario/', include('apps.users.api.urls')),
-    path('student/', include('apps.student.api.urls')),
-    path('researcher/', include('apps.researcher.api.urls')),
-    path('lgac/', include('apps.lgac.api.urls')),
-    path('call/', include('apps.call.api.urls')),
-    path('goals/', include('apps.goals.api.urls')),
-    path('company/', include('apps.company.api.urls')),
-    path('projects/', include('apps.project.api.urls')),  # Mantén solo esta línea para proyectos
     path('Files/', include('apps.Files.api.urls')),
-    path('goalstatic/', include('apps.goalstatic.api.urls')),
+    
+    
+    #nuevo
+    path('carrera/', include('apps.carrera.api.urls')),
+    path('colaboradores/', include('apps.colaboradores.api.urls')),
+    path('convocatoria/', include('apps.convocatoria.api.urls')),
+    path('empresa/', include('apps.empresa.api.urls')),
+    path('estudiante/', include('apps.estudiante.api.urls')),
+    path('investigador/', include('apps.investigador.api.urls')),
+    path('lineainvestigacion/', include('apps.lineainvestigacion.api.urls')),
+    path('metas/', include('apps.metas.api.urls')),
+    path('credenciales/', include('apps.credenciales.api.urls')),
+    path('proyecto/', include('apps.proyecto.api.urls')),
 ]

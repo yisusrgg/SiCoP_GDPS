@@ -29,15 +29,17 @@ BASE_APPS = [
 LOCAL_APPS=[
     
     'apps.users',
-    'apps.student',
-    'apps.project',
-    'apps.researcher',
-    'apps.call',
-    'apps.company',
-    'apps.goals',
-    'apps.lgac',
     'apps.Files',
-    'apps.goalstatic',
+    'apps.convocatoria',
+    'apps.empresa',
+    'apps.metas',
+    'apps.lineainvestigacion',
+    'apps.proyecto',
+    'apps.colaboradores',
+    'apps.credenciales',
+    'apps.investigador',
+    'apps.carrera',
+    'apps.estudiante',
 ]
 THIRD_APPS=[
     'rest_framework',   

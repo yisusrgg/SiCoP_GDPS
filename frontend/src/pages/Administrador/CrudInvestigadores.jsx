@@ -3,43 +3,18 @@ import TableViewer from "../../components/TableViewer";
 import { Box, Fab, Typography } from "@mui/material";
 import SideBarAdmin from "../../components/SideBarAdmin";
 import AddIcon from "@mui/icons-material/Add";
-import { Button } from "react-bootstrap";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const columns = [
-  { field: "id", headerName: "id", width: 80 },
-  { field: "Nombre", headerName: "Nombre(s)", width: 160 },
-  { field: "Apellido", headerName: "Apellido(s)", width: 160 },
-  { field: "Correo", headerName: "Correo", width: 160 },
-  { field: "Carrera", headerName: "Carrera", width: 160 },
-  { field: "Proyectos", headerName: "Proyectos", width: 160 },
-  {
-    field: "Acciones",
-    type: "actions",
-    headerName: "Acciones",
-    width: 160,
-    getActions: ({ id }) => {
-      return [
-        <GridActionsCellItem
-          icon={<EditIcon />}
-          label="Editar"
-          sx={{
-            color: "primary.main",
-          }}
-          onClick={() => console.log("Editar " + id)}
-        />,
-        <GridActionsCellItem
-          icon={<DeleteIcon />}
-          label="Eliminar"
-          onClick={() => console.log("Eliminar " + id)}
-          color="error"
-        />,
-      ];
-    },
-  },
+  { field: "id", headerName: "id", flex: 1 },
+  { field: "Nombre", headerName: "Nombre(s)", flex: 1 },
+  { field: "Apellido", headerName: "Apellido(s)", flex: 1 },
+  { field: "Correo", headerName: "Correo", flex: 1 },
+  { field: "Carrera", headerName: "Carrera", flex: 1 },
+  { field: "Proyectos", headerName: "Proyectos", flex: 1 },
 ];
 
 const rows = [
@@ -134,6 +109,33 @@ const rows = [
 ];
 
 function CrudInvestigadores() {
+  const navigate = useNavigate();
+
+  // Agrega la columna de acciones dinámicamente para usar navigate
+  const columnsWithNavigate = [
+    ...columns,
+    {
+      field: "Acciones",
+      type: "actions",
+      headerName: "Acciones",
+      width: 160,
+      getActions: ({ id }) => [
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          label="Editar"
+          sx={{ color: "primary.main" }}
+          onClick={() => navigate("/Administracion/RegistroInvestigador")}
+        />,
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          label="Eliminar"
+          onClick={() => console.log("Eliminar " + id)}
+          color="error"
+        />,
+      ],
+    },
+  ];
+
   return (
     <Box>
       <nav>
@@ -147,13 +149,12 @@ function CrudInvestigadores() {
           variant="extended"
           color="primary"
           sx={{ right: "-82vw", marginBottom: "10px" }}
+          onClick={() => navigate("/Administracion/RegistroInvestigador")}
         >
-          <Link to={"/NoTerminada"}  className="text-white link-underline-primary">
-            <AddIcon sx={{ mr: 1 }} />
-            Agregar nuevo
-          </Link>
+          <AddIcon sx={{ mr: 1 }} />
+          Agregar nuevo
         </Fab>
-        <TableViewer columns={columns} rows={rows} />
+        <TableViewer columns={columnsWithNavigate} rows={rows} />
       </div>
     </Box>
   );

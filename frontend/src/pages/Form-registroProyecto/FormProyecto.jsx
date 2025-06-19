@@ -20,16 +20,16 @@ import {
 } from "@mui/material"
 import SideBarAdmin from "../../components/SideBarAdmin"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
-import SaveIcon from "@mui/icons-material/Save"
+import NavigateNextIcon from "@mui/icons-material/NavigateNext"
 
 function FormProyecto() {
-  const { id } = useParams() // Obtiene el ID del proyecto desde la URL
-  const navigate = useNavigate() // Para redirigir al usuario
+  const { id } = useParams()
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     projectName: "",
     objetives: "",
     summary: "",
-    invArea: "CN", // Valor predeterminado
+    invArea: "CN",
     dateBegin: "",
     dateEnd: "",
     financing: false,
@@ -46,6 +46,7 @@ function FormProyecto() {
   const [companies, setCompanies] = useState([])
   const [lgacs, setLgacs] = useState([])
   const [leaders, setLeaders] = useState([])
+  const [errors, setErrors] = useState({})
 
   // Cargar datos desde el backend
   useEffect(() => {
@@ -75,13 +76,12 @@ function FormProyecto() {
       const fetchProject = async () => {
         try {
           const response = await axios.get(`http://127.0.0.1:8000/projects/projects/${id}/`)
-          setFormData(response.data) // Carga los datos del proyecto en el formulario
+          setFormData(response.data)
         } catch (error) {
           console.error("Error al cargar el proyecto:", error)
           alert("Hubo un error al cargar los datos del proyecto.")
         }
       }
-
       fetchProject()
     }
   }, [id])
@@ -93,7 +93,7 @@ function FormProyecto() {
       setFormData((prev) => ({
         ...prev,
         financing: checked,
-        amount: checked ? 1000 : "", // Si se activa, pone 1000; si se desactiva, limpia el campo
+        amount: checked ? 1000 : "",
       }));
     } else {
       setFormData((prev) => ({
@@ -103,44 +103,47 @@ function FormProyecto() {
     }
   };
 
+  // Validación de campos requeridos antes de avanzar
+  const validateFields = () => {
+    const newErrors = {};
+    if (!formData.projectName) newErrors.projectName = "Campo requerido";
+    if (!formData.objetives) newErrors.objetives = "Campo requerido";
+    if (!formData.summary) newErrors.summary = "Campo requerido";
+    if (!formData.invArea) newErrors.invArea = "Campo requerido";
+    if (!formData.dateBegin) newErrors.dateBegin = "Campo requerido";
+    if (!formData.dateEnd) newErrors.dateEnd = "Campo requerido";
+    if (formData.dateBegin && formData.dateEnd && formData.dateEnd < formData.dateBegin) {
+      newErrors.dateEnd = "La fecha de fin no puede ser anterior a la de inicio";
+    }
+    if (formData.financing && (!formData.amount || formData.amount < 1000)) newErrors.amount = "Monto mínimo $1000";
+    if (!formData.rfcCall) newErrors.rfcCall = "Campo requerido";
+    if (!formData.rfcCom) newErrors.rfcCom = "Campo requerido";
+    if (!formData.lgac_Linea) newErrors.lgac_Linea = "Campo requerido";
+    if (!formData.projectLeader) newErrors.projectLeader = "Campo requerido";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const caracteresValidos = /^[a-zA-Z0-9ÁÉÍÓÚáéíóúÑñüÜ\s]+$/;
-  const handleSubmit = async (e) => {
+
+  // Botón "Regresar" a Proyectos
+  const handleBack = () => {
+    navigate("/Administracion/Proyectos");
+  };
+
+  // Botón "Siguiente" a Metas, solo si todo es válido
+  const handleNext = (e) => {
     e.preventDefault();
+    if (!validateFields()) {
+      alert("Por favor, completa todos los campos obligatorios correctamente.");
+      return;
+    }
     if (!caracteresValidos.test(formData.projectName)) {
       alert("El Nombre del Proyecto no debe contener caracteres especiales.");
       return;
     }
-
-
-    if (formData.dateBegin && formData.dateEnd && formData.dateEnd < formData.dateBegin) {
-      alert("La fecha de fin no puede ser anterior a la fecha de inicio.");
-      return;
-    }
-
-    let dataToSend = { ...formData };
-    if (!formData.financing) {
-      dataToSend.amount = null; 
-    }
-
-    try {
-      if (id) {
-        // Usa dataToSend aquí
-        await axios.put(`http://127.0.0.1:8000/projects/projects/${id}/`, dataToSend);
-        alert("Proyecto actualizado exitosamente");
-      } else {
-        // Usa dataToSend aquí
-        await axios.post("http://127.0.0.1:8000/projects/projects/", dataToSend);
-        alert("Proyecto creado exitosamente");
-      }
-      navigate("/Administracion/Proyectos");
-    } catch (error) {
-      console.error("Error al guardar el proyecto:", error.response || error);
-      if (error.response && error.response.data) {
-        alert(`Error del backend: ${JSON.stringify(error.response.data)}`);
-      } else {
-        alert("Error al guardar el proyecto");
-      }
-    }
+    // Aquí podrías guardar temporalmente el formData si lo necesitas
+    navigate("/Metas");
   };
 
   return (
@@ -158,7 +161,7 @@ function FormProyecto() {
             {id ? "Modifica los datos de la línea de investigación" : "Ingresa los datos de la línea de investigación"}
           </Typography>
 
-          <form onSubmit={handleSubmit} noValidate>
+          <form onSubmit={handleNext} noValidate>
             <Grid container spacing={3}>
 
               <Grid item xs={12}>
@@ -168,11 +171,15 @@ function FormProyecto() {
                     fullWidth
                     name="projectName"
                     value={formData.projectName}
-                    onChange={handleChange}
+                    onChange={e => {
+                      setFormData({ ...formData, projectName: e.target.value });
+                      setErrors({ ...errors, projectName: undefined });
+                    }}
                     required
                     variant="outlined"
                     inputProps={{ maxLength: 254 }}
-                    helperText=" "
+                    helperText={errors.projectName || " "}
+                    error={!!errors.projectName}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end" sx={{ ml: 1 }}>
@@ -193,13 +200,17 @@ function FormProyecto() {
                     fullWidth
                     name="objetives"
                     value={formData.objetives}
-                    onChange={handleChange}
+                    onChange={e => {
+                      setFormData({ ...formData, objetives: e.target.value });
+                      setErrors({ ...errors, objetives: undefined });
+                    }}
                     required
                     multiline
                     rows={4}
                     variant="outlined"
                     inputProps={{ maxLength: 1000 }}
-                    helperText=" "
+                    helperText={errors.objetives || " "}
+                    error={!!errors.objetives}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end" sx={{ ml: 1 }}>
@@ -220,18 +231,22 @@ function FormProyecto() {
                     fullWidth
                     name="summary"
                     value={formData.summary}
-                    onChange={handleChange}
+                    onChange={e => {
+                      setFormData({ ...formData, summary: e.target.value });
+                      setErrors({ ...errors, summary: undefined });
+                    }}
                     required
                     multiline
                     rows={4}
                     variant="outlined"
                     inputProps={{ maxLength: 1000 }}
-                    helperText=" "
+                    helperText={errors.summary || " "}
+                    error={!!errors.summary}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end" sx={{ ml: 1 }}>
                           <Typography variant="caption" color="text.secondary">
-                            {`${formData.objetives.length}/1000`}
+                            {`${formData.summary.length}/1000`}
                           </Typography>
                         </InputAdornment>
                       ),
@@ -243,7 +258,7 @@ function FormProyecto() {
               <Grid item xs={12}>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Typography sx={{ minWidth: "200px" }}>Área de Investigación:</Typography>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth error={!!errors.invArea}>
                     <Select name="invArea" value={formData.invArea} onChange={handleChange} required displayEmpty>
                       <MenuItem value="">Seleccione un área</MenuItem>
                       <MenuItem value="ED">Educación</MenuItem>
@@ -257,6 +272,7 @@ function FormProyecto() {
                       <MenuItem value="SD">Salud</MenuItem>
                       <MenuItem value="SV">Servicios</MenuItem>
                     </Select>
+                    <Typography variant="caption" color="error">{errors.invArea}</Typography>
                   </FormControl>
                 </Box>
               </Grid>
@@ -269,10 +285,15 @@ function FormProyecto() {
                     name="dateBegin"
                     type="date"
                     value={formData.dateBegin}
-                    onChange={handleChange}
+                    onChange={e => {
+                      setFormData({ ...formData, dateBegin: e.target.value });
+                      setErrors({ ...errors, dateBegin: undefined });
+                    }}
                     required
                     InputLabelProps={{ shrink: true }}
                     variant="outlined"
+                    helperText={errors.dateBegin || " "}
+                    error={!!errors.dateBegin}
                   />
                 </Box>
               </Grid>
@@ -285,13 +306,18 @@ function FormProyecto() {
                     name="dateEnd"
                     type="date"
                     value={formData.dateEnd}
-                    onChange={handleChange}
+                    onChange={e => {
+                      setFormData({ ...formData, dateEnd: e.target.value });
+                      setErrors({ ...errors, dateEnd: undefined });
+                    }}
                     required
                     InputLabelProps={{ shrink: true }}
                     variant="outlined"
                     inputProps={{
-                      min: formData.dateBegin || undefined, // <-- Esto evita seleccionar una fecha menor
+                      min: formData.dateBegin || undefined,
                     }}
+                    helperText={errors.dateEnd || " "}
+                    error={!!errors.dateEnd}
                   />
                 </Box>
               </Grid>
@@ -314,11 +340,15 @@ function FormProyecto() {
                     name="amount"
                     type="number"
                     value={formData.amount}
-                    onChange={handleChange}
+                    onChange={e => {
+                      setFormData({ ...formData, amount: e.target.value });
+                      setErrors({ ...errors, amount: undefined });
+                    }}
                     disabled={!formData.financing}
                     variant="outlined"
                     inputProps={{ min: 1000, max: 99999999 }}
-                    helperText=" "
+                    helperText={errors.amount || " "}
+                    error={!!errors.amount}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end" sx={{ ml: 1 }}>
@@ -335,7 +365,7 @@ function FormProyecto() {
               <Grid item xs={12}>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Typography sx={{ minWidth: "200px" }}>RFC Convocatoria:</Typography>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth error={!!errors.rfcCall}>
                     <Select name="rfcCall" value={formData.rfcCall} onChange={handleChange} required displayEmpty>
                       <MenuItem value="">Seleccione una convocatoria</MenuItem>
                       {calls.map((call) => (
@@ -344,6 +374,7 @@ function FormProyecto() {
                         </MenuItem>
                       ))}
                     </Select>
+                    <Typography variant="caption" color="error">{errors.rfcCall}</Typography>
                   </FormControl>
                 </Box>
               </Grid>
@@ -351,7 +382,7 @@ function FormProyecto() {
               <Grid item xs={12}>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Typography sx={{ minWidth: "200px" }}>RFC Compañía:</Typography>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth error={!!errors.rfcCom}>
                     <Select name="rfcCom" value={formData.rfcCom} onChange={handleChange} required displayEmpty>
                       <MenuItem value="">Seleccione una compañía</MenuItem>
                       {companies.map((company) => (
@@ -360,6 +391,7 @@ function FormProyecto() {
                         </MenuItem>
                       ))}
                     </Select>
+                    <Typography variant="caption" color="error">{errors.rfcCom}</Typography>
                   </FormControl>
                 </Box>
               </Grid>
@@ -367,7 +399,7 @@ function FormProyecto() {
               <Grid item xs={12}>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Typography sx={{ minWidth: "200px" }}>LGAC Línea:</Typography>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth error={!!errors.lgac_Linea}>
                     <Select name="lgac_Linea" value={formData.lgac_Linea} onChange={handleChange} required displayEmpty>
                       <MenuItem value="">Seleccione una LGAC</MenuItem>
                       {lgacs.map((lgac) => (
@@ -376,6 +408,7 @@ function FormProyecto() {
                         </MenuItem>
                       ))}
                     </Select>
+                    <Typography variant="caption" color="error">{errors.lgac_Linea}</Typography>
                   </FormControl>
                 </Box>
               </Grid>
@@ -383,7 +416,7 @@ function FormProyecto() {
               <Grid item xs={12}>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Typography sx={{ minWidth: "200px" }}>Líder del Proyecto:</Typography>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth error={!!errors.projectLeader}>
                     <Select
                       name="projectLeader"
                       value={formData.projectLeader}
@@ -398,6 +431,7 @@ function FormProyecto() {
                         </MenuItem>
                       ))}
                     </Select>
+                    <Typography variant="caption" color="error">{errors.projectLeader}</Typography>
                   </FormControl>
                 </Box>
               </Grid>
@@ -419,7 +453,7 @@ function FormProyecto() {
                     fullWidth
                     name="projectcol"
                     value={formData.projectcol}
-                    onChange={handleChange}
+                    onChange={e => setFormData({ ...formData, projectcol: e.target.value })}
                     variant="outlined"
                     inputProps={{ maxLength: 50 }}
                     helperText=" "
@@ -446,7 +480,7 @@ function FormProyecto() {
                     variant="contained"
                     color="primary"
                     startIcon={<ArrowBackIcon />}
-                    onClick={() => navigate("/Administracion/Proyectos")}
+                    onClick={handleBack}
                     sx={{ bgcolor: "#003366" }}
                   >
                     Regresar
@@ -455,10 +489,10 @@ function FormProyecto() {
                     type="submit"
                     variant="contained"
                     color="primary"
-                    startIcon={<SaveIcon />}
+                    endIcon={<NavigateNextIcon />}
                     sx={{ bgcolor: "#003366" }}
                   >
-                    {id ? "Guardar Cambios" : "Registrar"}
+                    Siguiente
                   </Button>
                 </Box>
               </Grid>

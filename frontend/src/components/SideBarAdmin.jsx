@@ -108,7 +108,7 @@ function SideBarAdmin() {
         */}
           <Tooltip title="Convocatorias" placement="right">
             <ListItemButton style={{ marginBottom: 20, justifyContent: "center" }}
-              onClick={() => navigate(`/`)}
+              onClick={() => navigate(`/Administracion/Convocatorias`)}
             >
               <GraphicEqIcon />
             </ListItemButton>

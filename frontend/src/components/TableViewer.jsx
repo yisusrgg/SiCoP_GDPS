@@ -47,6 +47,7 @@ export default function TableViewer({ columns, rows }) {
           Exportar a pdf
         </Button>
         <DataGrid
+          checkboxSelection
           rows={rows}
           columns={columns}
           initialState={{ pagination: { paginationModel } }}

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import SideBar_Detalles from "../../components/SideBar_Detalles";
 import NavBar from "../../components/NavBar";
 import Footer from "../../components/Footer";
 import {
@@ -15,7 +14,8 @@ import {
   Box,
   Typography,
   IconButton,
-  CssBaseline
+  CssBaseline,
+  Grid,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -23,11 +23,6 @@ export default function Metas() {
   const navigate = useNavigate();
   const { register, formState: { errors }, handleSubmit } = useForm();
   const [selectedMetas, setSelectedMetas] = useState([]);
-
-  const onSubmit = (userInfo) => {
-    console.log(userInfo);
-    navigate('/RegistroProyecto/4');
-  };
 
   const messages = {
     req: "Este campo es obligatorio (0 si no hay)",
@@ -64,14 +59,38 @@ export default function Metas() {
     setSelectedMetas(selectedMetas.filter(meta => meta.id !== metaId));
   };
 
+  const onSubmit = (userInfo) => {
+    navigate('/Colaboradores');
+  };
+
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <CssBaseline />
       <NavBar />
-      <Box sx={{ display: "flex", flexGrow: 1, mt: 8, mb: 8 }}>
-        <SideBar_Detalles />
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-          <form onSubmit={handleSubmit(onSubmit)} style={{ paddingBottom: '80px' }}>
+      <Box
+        sx={{
+          flexGrow: 1,
+          overflowY: "auto",
+          mt: 8,
+          mb: 8,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+        }}
+      >
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            maxWidth: 1100,
+            width: "100%",
+            backgroundColor: "#fff",
+            borderRadius: 3,
+            boxShadow: 3,
+          }}
+        >
+          <form onSubmit={handleSubmit(onSubmit)}>
             <FormControl fullWidth margin="normal">
               <InputLabel id="metaSelect-label">Metas</InputLabel>
               <Select
@@ -116,21 +135,50 @@ export default function Metas() {
                 />
               </Paper>
             ))}
-            <Box textAlign="center" mt={3}>
-            <Button
-                type="submit"
-                variant="contained"
-                style={{
-                  backgroundColor: "#1B396A",
-                  color: "#fff",
-                  borderRadius: "20px",
-                }}
-                onMouseEnter={(e) => (e.target.style.backgroundColor = "#162e54")}
-                onMouseLeave={(e) => (e.target.style.backgroundColor = "#1B396A")}
+            <Grid container spacing={2} className="p-3" sx={{ mt: 2, mb: 0 }}>
+              <Grid
+                item
+                xs={12}
+                style={{ display: "flex", justifyContent: "space-between" }}
               >
-                Confirmar
-              </Button>
-            </Box>
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate("/RegistroProyecto2")}
+                  style={{
+                    borderColor: "#1B396A",
+                    color: "#1B396A",
+                    borderRadius: "20px",
+                  }}
+                  onMouseEnter={(e) => (
+                    (e.target.style.backgroundColor = "#1B396A"),
+                    (e.target.style.color = "#fff")
+                  )}
+                  onMouseLeave={(e) => (
+                    (e.target.style.backgroundColor = "transparent"),
+                    (e.target.style.color = "#1B396A")
+                  )}
+                >
+                  Regresar
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  style={{
+                    backgroundColor: "#1B396A",
+                    color: "#fff",
+                    borderRadius: "20px",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "#162e54")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "#1B396A")
+                  }
+                >
+                  Siguiente
+                </Button>
+              </Grid>
+            </Grid>
           </form>
         </Box>
       </Box>

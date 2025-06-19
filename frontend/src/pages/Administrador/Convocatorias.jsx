@@ -3,7 +3,7 @@ import ConvocatoriasCard from "../../components/ConvocatoriasCard";
 import NavBar from "../../components/NavBar";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
-import SideBarAdmin from "../../components/SideBarAdmin";
+import SideBarAdmin from "../../components/SideBarAdmin"; // Cambia aquí
 
 export default function Proyectos({ user = { type: "Admin" } }) {
   const navigate = useNavigate();
@@ -12,12 +12,16 @@ export default function Proyectos({ user = { type: "Admin" } }) {
       <CssBaseline />
       {user && user.type === "Admin" && (
         <nav>
-          <SideBarAdmin />
+          <SideBarAdmin /> {/* Cambia aquí */}
         </nav>
       )}
       <div
         className="text-center"
-        style={(user && user.type === "Admin") ? { paddingTop: "50px", marginLeft: "80px"} : { paddingTop: "50px"}}
+        style={
+          user && user.type === "Admin"
+            ? { paddingTop: "50px", marginLeft: "80px" }
+            : { paddingTop: "50px" }
+        }
       >
         <Typography variant="h4" align="center" style={{ marginTop: "20px" }}>
           Convocatorias
@@ -25,7 +29,7 @@ export default function Proyectos({ user = { type: "Admin" } }) {
         {user && user.type === "Admin" && (
           <button
             type="button"
-            class="btn btn-link"
+            className="btn btn-link"
             onClick={() => navigate(`/Administracion/RegistroConvocatorias`)}
           >
             Registrar Convocatoria

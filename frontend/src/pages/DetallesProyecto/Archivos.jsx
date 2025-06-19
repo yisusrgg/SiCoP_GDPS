@@ -1,5 +1,5 @@
 import React, { useCallback, useState, use } from "react";
-import SideBar_Detalles from "../../components/SideBar_Detalles";
+import SideBar from "../../components/SideBar"; // Cambia el import al nuevo sidebar
 import { useDropzone } from "react-dropzone";
 import { Button, Link, Snackbar, Alert, Paper } from "@mui/material";
 import { app } from "../../fb";
@@ -32,17 +32,15 @@ function Basic(props) {
   });
 
   const files = acceptedFiles.filter((file) => file.type === "application/pdf");
-  // Nombramiento de documentacion:
-  // [NombreInvest]-[idProyecto]-[NombreArchivo].pdf
 
   const handleUpload = async (props) => {
     const file = files[0];
     setLoading(true);
     try {
       const storageRef = app.storage().ref();
-      const archivoPath = storageRef.child(file.name); // * Aqui se pone el nombre con el que se va a subir
+      const archivoPath = storageRef.child(file.name);
       await archivoPath.put(file);
-      const downloadURL = await archivoPath.getDownloadURL(); // * Obtener el enlace de descarga
+      const downloadURL = await archivoPath.getDownloadURL();
       console.log("Enlace de descarga:", downloadURL);
     } catch (error) {
       console.error(error);
@@ -61,7 +59,6 @@ function Basic(props) {
   };
 
   React.useEffect(() => {
-    // Cleanup URL object when the component unmounts or when a new file is uploaded
     return () => {
       if (pdfUrl) {
         URL.revokeObjectURL(pdfUrl);
@@ -71,8 +68,8 @@ function Basic(props) {
 
   return (
     <div>
-      {pdfUrl===null && (<div class="card">
-        <div class="card-body">
+      {pdfUrl===null && (<div className="card">
+        <div className="card-body">
           <div {...getRootProps({ className: "dropzone" })}>
             <input {...getInputProps()} />
             <p style={{ color: "gray", fontStyle: "italic" }}>
@@ -96,14 +93,14 @@ function Basic(props) {
 
           <button
             type="button"
-            class="btn btn-outline-primary"
+            className="btn btn-outline-primary"
             onClick={handleUpload}
           >
             {
             loading ? (
-              <div class="text-center">
-                <div class="spinner-border" role="status">
-                  <span class="visually-hidden">Loading...</span>
+              <div className="text-center">
+                <div className="spinner-border" role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
               </div>
             ) : (
@@ -115,7 +112,6 @@ function Basic(props) {
         </aside>
       ) : (
         <aside>
-          
           <p className="fs-6 text-danger">* Sube el documento en formato pdf</p>
         </aside>
       )}
@@ -190,22 +186,22 @@ export default function Archivos() {
       style={{ paddingTop: 80, paddingLeft: 30 }}
     >
       <nav>
-        <SideBar_Detalles />
+        <SideBar /> {/* Usa el nuevo sidebar aquí */}
       </nav>
       <div className="row text-center">
         <h1>Captura de archivos</h1>
 
         <div className="container col">
-          <div class="row row-cols-2 row-cols-lg-2 g-2 g-lg-3">
-            <div class="col-sm-6 mb-3 mb-sm-0 p-2">
-              <div class="card">
-                <div class="card-body">
-                  <h2 class="card-title">Registro</h2>
+          <div className="row row-cols-2 row-cols-lg-2 g-2 g-lg-3">
+            <div className="col-sm-6 mb-3 mb-sm-0 p-2">
+              <div className="card">
+                <div className="card-body">
+                  <h2 className="card-title">Registro</h2>
                   <a
                     className="btn p-0 m-0 text-body-secondary"
                     onClick={() => console.log("formato")}
                   >
-                    Descargar formato <i class="bi bi-download"></i>
+                    Descargar formato <i className="bi bi-download"></i>
                   </a>
                   <h6>
                     Fecha limite:{" "}
@@ -221,15 +217,15 @@ export default function Archivos() {
                 </div>
               </div>
             </div>
-            <div class="col-sm-6 mb-3 mb-sm-0 p-2">
-              <div class="card">
-                <div class="card-body">
-                  <h2 class="card-title">Protocolo</h2>
+            <div className="col-sm-6 mb-3 mb-sm-0 p-2">
+              <div className="card">
+                <div className="card-body">
+                  <h2 className="card-title">Protocolo</h2>
                   <a
                     className="btn p-0 m-0 text-body-secondary"
                     onClick={() => console.log("formato")}
                   >
-                    Descargar formato <i class="bi bi-download"></i>
+                    Descargar formato <i className="bi bi-download"></i>
                   </a>
                   <h6>
                     Fecha limite:{" "}
@@ -246,16 +242,16 @@ export default function Archivos() {
               </div>{" "}
             </div>
           </div>
-          <div class="row row-cols-2 row-cols-lg-2 g-2 g-lg-3">
-            <div class="col-sm-6 mb-3 mb-sm-0 p-2">
-              <div class="card">
-                <div class="card-body">
-                  <h2 class="card-title">Informe</h2>
+          <div className="row row-cols-2 row-cols-lg-2 g-2 g-lg-3">
+            <div className="col-sm-6 mb-3 mb-sm-0 p-2">
+              <div className="card">
+                <div className="card-body">
+                  <h2 className="card-title">Informe</h2>
                   <a
                     className="btn p-0 m-0 text-body-secondary"
                     onClick={() => console.log("formato")}
                   >
-                    Descargar formato <i class="bi bi-download"></i>
+                    Descargar formato <i className="bi bi-download"></i>
                   </a>
                   <h6>
                     Fecha limite:{" "}
@@ -271,15 +267,15 @@ export default function Archivos() {
                 </div>
               </div>
             </div>
-            <div class="col-sm-6 mb-3 mb-sm-0 p-2">
-              <div class="card">
-                <div class="card-body">
-                  <h2 class="card-title">Carta de tercero</h2>
+            <div className="col-sm-6 mb-3 mb-sm-0 p-2">
+              <div className="card">
+                <div className="card-body">
+                  <h2 className="card-title">Carta de tercero</h2>
                   <a
                     className="btn p-0 m-0 text-body-secondary"
                     onClick={() => console.log("formato")}
                   >
-                    Descargar formato <i class="bi bi-download"></i>
+                    Descargar formato <i className="bi bi-download"></i>
                   </a>
                   <h6>
                     Fecha limite:{" "}

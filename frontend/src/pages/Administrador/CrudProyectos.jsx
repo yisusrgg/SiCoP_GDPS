@@ -1,97 +1,193 @@
 import React, { useEffect, useState } from "react";
 import { getAllProyects, deleteProject } from "../../api/proyecto.api";
 import TableViewer from "../../components/TableViewer";
-import { Box, Fab, Typography } from "@mui/material";
+import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import SideBarAdmin from "../../components/SideBarAdmin";
-import AddIcon from "@mui/icons-material/Add";
-import { Link } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { GridActionsCellItem } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
+
+const STORAGE_KEY = "proyectosRows";
+const EDITABLES_KEY = "proyectosEditables";
 
 function CrudProyectos() {
   const [rows, setRows] = useState([]);
-  const navigate = useNavigate(); // Hook para redirigir
+  const [editables, setEditables] = useState({});
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const navigate = useNavigate();
 
-  // Función para manejar la eliminación
-  const handleDelete = async (id) => {
-    console.log("Eliminar proyecto con ID:", id);
-    if (window.confirm("¿Estás seguro de que deseas eliminar este proyecto?")) {
-      try {
-        await deleteProject(id); // Llama a la API para eliminar el proyecto
-        alert("Proyecto eliminado exitosamente");
-        setRows((prevRows) => prevRows.filter((row) => row.id !== id)); // Actualiza la tabla eliminando la fila
-      } catch (error) {
-        console.error("Error al eliminar el proyecto:", error);
-        alert("Hubo un error al eliminar el proyecto");
-      }
-    }
+  // Cargar editables de localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem(EDITABLES_KEY);
+    if (stored) setEditables(JSON.parse(stored));
+  }, []);
+
+  // Guardar editables en localStorage
+  useEffect(() => {
+    localStorage.setItem(EDITABLES_KEY, JSON.stringify(editables));
+  }, [editables]);
+
+  // Cambia el estatus de un proyecto y sincroniza con localStorage
+  const handleToggleEstatus = (id) => {
+    setRows((prevRows) => {
+      const updatedRows = prevRows.map((row) =>
+        row.id === id
+          ? {
+              ...row,
+              Estatus: row.Estatus === "Completado" ? "No Completado" : "Completado",
+            }
+          : row
+      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedRows));
+      return updatedRows;
+    });
   };
 
-  const handleEdit = (id) => {
-    console.log("Modificar proyecto con ID:", id);
-    navigate(`/EditarProyecto/${id}`); // Redirige al formulario de edición
+  // Abre el modal de confirmación para editar
+  const handleEditModal = (id) => {
+    setSelectedId(id);
+    setModalOpen(true);
   };
 
-  // Definición de las columnas
+  // Confirma la edición y alterna el estado editable
+  const confirmToggleEditable = () => {
+    setEditables((prev) => {
+      const updated = { ...prev, [selectedId]: !prev[selectedId] };
+      return updated;
+    });
+    setModalOpen(false);
+    setSelectedId(null);
+  };
+
+  // Cancela el modal
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedId(null);
+  };
+
+  // Navega a EditarProyectos con los datos del proyecto seleccionado
+  const handleEdit = (row) => {
+    navigate("/EditarProyecto", { state: { proyecto: row } });
+  };
+
+  // Definición de las columnas de la tabla (sin columna de acciones)
   const columns = [
-    { field: "id", headerName: "id", width: 80 },
-    { field: "Nombre", headerName: "Nombre(s)", width: 300 },
-    { field: "Empresa", headerName: "Empresa", width: 300 },
-    { field: "LGAC", headerName: "LGAC", width: 300 },
-    { field: "Lider", headerName: "Lider", width: 300 },
-    { field: "Estatus", headerName: "Estatus", width: 300 },
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "Nombre", headerName: "Nombre(s)", flex: 1 },
+    { field: "Empresa", headerName: "Empresa", flex: 1 },
+    { field: "LGAC", headerName: "LGAC", flex: 1 },
+    { field: "Lider", headerName: "Líder", flex: 1 },
     {
-      field: "Acciones",
-      type: "actions",
-      headerName: "Acciones",
-      width: 160,
-      getActions: ({ id }) => {
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Modificar"
-            sx={{
-              color: "primary.main",
-            }}
-            onClick={() => handleEdit(id)} // Llama correctamente a handleEdit
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Eliminar"
-            onClick={() => handleDelete(id)} // Llama a handleDelete con el ID
-            color="error"
-          />,
-        ];
-      },
+      field: "Estatus",
+      headerName: "Estatus",
+      width: 180,
+      renderCell: (params) => (
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => handleToggleEstatus(params.row.id)}
+          sx={{
+            minWidth: 150,
+            height: 36,
+            backgroundColor: params.row.Estatus === "Completado" ? "#1976d2" : "#757575",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: params.row.Estatus === "Completado" ? "#115293" : "#616161",
+            },
+            textTransform: "none",
+            fontWeight: 600,
+            padding: 0,
+          }}
+        >
+          {params.row.Estatus === "Completado" ? "Completado" : "No Completado"}
+        </Button>
+      ),
     },
+    {
+      field: "Editar",
+      headerName: "Editar",
+      width: 180,
+      renderCell: (params) => (
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => handleEditModal(params.row.id)}
+          startIcon={<EditIcon />}
+          sx={{
+            minWidth: 150,
+            height: 36,
+            backgroundColor: editables[params.row.id] ? "#1976d2" : "#757575",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: editables[params.row.id] ? "#115293" : "#616161",
+            },
+            textTransform: "none",
+            fontWeight: 600,
+            padding: 0,
+          }}
+        >
+          {editables[params.row.id] ? "Modificar" : "Deshabilitado"}
+        </Button>
+      ),
+    },
+    // Se eliminó la columna de acciones
   ];
 
-  // Cargar los datos de los proyectos
+  // Carga de datos de ejemplo o desde localStorage
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await getAllProyects();
-        console.log("Datos del backend:", response.data);
-
-        const projects = response.data.map((project) => ({
-          id: project.id,
-          Nombre: project.projectName,
-          Empresa: project.company_name,
-          LGAC: project.rfc_call,
-          Lider: project.leader_name,
-          Estatus: project.linked ? "Vinculado" : "No vinculado",
-        }));
-
-        setRows(projects);
-      } catch (error) {
-        console.error("Error al obtener los proyectos:", error);
-      }
-    };
-
-    fetchProjects();
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      setRows(JSON.parse(stored));
+    } else {
+      const mockProjects = [
+        {
+          id: 1,
+          Nombre: "Sistema de Gestión de Inventarios",
+          Empresa: "Tech Solutions S.A.",
+          LGAC: "Innovación Tecnológica",
+          Lider: "Juan Pérez",
+          Estatus: "Completado",
+        },
+        {
+          id: 2,
+          Nombre: "Plataforma de E-Learning",
+          Empresa: "EducaOnline",
+          LGAC: "Educación Digital",
+          Lider: "María Gómez",
+          Estatus: "No Completado",
+        },
+        {
+          id: 3,
+          Nombre: "Aplicación Móvil de Salud",
+          Empresa: "HealthCare Inc.",
+          LGAC: "Tecnología Médica",
+          Lider: "Carlos Rodríguez",
+          Estatus: "Completado",
+        },
+        {
+          id: 4,
+          Nombre: "Automatización de Procesos",
+          Empresa: "AutoSys Corp.",
+          LGAC: "Automatización Industrial",
+          Lider: "Ana López",
+          Estatus: "No Completado",
+        },
+        {
+          id: 5,
+          Nombre: "Sistema de Monitoreo Ambiental",
+          Empresa: "GreenTech",
+          LGAC: "Sostenibilidad",
+          Lider: "Luis Martínez",
+          Estatus: "Completado",
+        },
+      ];
+      setRows(mockProjects);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(mockProjects));
+    }
   }, []);
+
+  // Encuentra el nombre del proyecto seleccionado para el modal
+  const selectedProject = rows.find((row) => row.id === selectedId);
 
   return (
     <Box>
@@ -100,18 +196,20 @@ function CrudProyectos() {
       </nav>
       <div className="p-5" style={{ marginTop: "5vh", marginLeft: "2vw" }}>
         <Typography variant="h3">Proyectos</Typography>
-        <Fab
-          variant="extended"
-          color="primary"
-          sx={{ right: "-82vw", marginBottom: "10px" }}
-        >
-          <Link to={"/RegistroProyecto"} className="text-white link-underline-primary">
-            <AddIcon sx={{ mr: 1 }} />
-            Agregar nuevo
-          </Link>
-        </Fab>
         <TableViewer columns={columns} rows={rows} />
       </div>
+      <Dialog open={modalOpen} onClose={handleCloseModal}>
+        <DialogTitle>Confirmar acción</DialogTitle>
+        <DialogContent>
+          ¿Desea {editables[selectedId] ? "desactivar" : "activar"} la edición para el proyecto <b>{selectedProject?.Nombre}</b>?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="inherit">Cancelar</Button>
+          <Button onClick={confirmToggleEditable} color="primary" variant="contained">
+            Sí, {editables[selectedId] ? "desactivar" : "activar"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

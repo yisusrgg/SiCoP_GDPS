@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
@@ -44,6 +44,13 @@ function InvRegistro() {
     console.log(res);
     navigate("/Detalles/Investigadores");
   });
+
+  const [carreras, setCarreras] = useState([]);
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/carrera/carreras/')
+      .then(response => response.json())
+      .then(data => setCarreras(data));
+  }, []);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
@@ -190,19 +197,12 @@ function InvRegistro() {
                       ) : null
                     }
                   >
-                    <MenuItem value="1">
-                      Ingeniería en Sistemas Computacionales
-                    </MenuItem>
-                    <MenuItem value="2">
-                      Ingeniería en Sistemas Automotrices
-                    </MenuItem>
-                    <MenuItem value="3">Ingeniería Industrial</MenuItem>
-                    <MenuItem value="4">
-                      Ingeniería en Gestión Empresarial
-                    </MenuItem>
-                    <MenuItem value="5">Ingeniería Ambiental</MenuItem>
-                    <MenuItem value="5">Ingeniería Semiconductores</MenuItem>
-                    <MenuItem value="6">Gastronomía</MenuItem>
+                    <MenuItem value="">Selecciona una carrera</MenuItem>
+                    {carreras.map((carrera) => (
+                      <MenuItem key={carrera.claveCarrera} value={carrera.claveCarrera}>
+                        {carrera.nombreCarrera}
+                      </MenuItem>
+                    ))}
                   </CustomSelect>
                 </FormControl>
               </div>
