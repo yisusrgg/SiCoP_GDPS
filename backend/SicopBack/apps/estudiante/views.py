@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from apps.estudiante.models import Estudiante
+from apps.estudiante.api.serializers import EstudianteSerializer
 
-# Create your views here.
+class EstudianteViewSet(viewsets.ModelViewSet):
+    queryset = Estudiante.objects.all()
+    serializer_class = EstudianteSerializer

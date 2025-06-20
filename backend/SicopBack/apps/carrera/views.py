@@ -1,7 +1,11 @@
 from rest_framework import generics
-from .models import Carrera
-from apps.carrera.api.serializer import CarreraSerializer
+from apps.carrera.models import Carrera
+from apps.carrera.api.serializers import CarreraSerializer
 
-class CarreraListAPIView(generics.ListAPIView):
+class CarreraListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Carrera.objects.all()
+    serializer_class = CarreraSerializer
+
+class CarreraRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Carrera.objects.all()
     serializer_class = CarreraSerializer

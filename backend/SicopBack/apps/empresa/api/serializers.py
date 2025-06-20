@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.empresa.models import Empresa
 
-class EmpresaSerializers(serializers.ModelSerializer):
+class EmpresaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Empresa
         fields = '__all__'

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.metas.models import Metas
 
-class MetasSerialier(serializers.ModelSerializer):
+class MetasSerializer(serializers.ModelSerializer):
     class Meta:
         model = Metas
         fields = '__all__'

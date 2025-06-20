@@ -1,7 +1,10 @@
-from rest_framework.routers import DefaultRouter
-from .api import ProyectoViewSet
+from django.urls import path, include
+from rest_framework import routers
+from apps.proyecto.views import ProyectoViewSet
 
-router = DefaultRouter()
-router.register(r'proyectos', ProyectoViewSet, basename='proyectos')
+router = routers.DefaultRouter()
+router.register(r'proyectos', ProyectoViewSet, basename='proyecto')
 
-urlpatterns = router.urls
+urlpatterns = [
+    path("", include(router.urls)),
+]

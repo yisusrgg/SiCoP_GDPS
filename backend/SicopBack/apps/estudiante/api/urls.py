@@ -1,7 +1,10 @@
-from rest_framework.routers import DefaultRouter
-from apps.estudiante.api.api import EstudianteViewSet
+from django.urls import path, include
+from rest_framework import routers
+from apps.estudiante.views import EstudianteViewSet
 
-router = DefaultRouter()
+router = routers.DefaultRouter()
 router.register(r'estudiantes', EstudianteViewSet, basename='estudiante')
 
-urlpatterns = router.urls
+urlpatterns = [
+    path("", include(router.urls)),
+]

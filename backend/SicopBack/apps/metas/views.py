@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from apps.metas.models import Metas
+from apps.metas.api.serializers import MetasSerializer
 
-# Create your views here. Version html
+class MetasViewSet(viewsets.ModelViewSet):
+    queryset = Metas.objects.all()
+    serializer_class = MetasSerializer

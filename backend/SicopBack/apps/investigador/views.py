@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from apps.investigador.models import Investigador
+from apps.investigador.api.serializers import InvestigadorSerializer
 
-# Create your views here.
+class InvestigadorViewSet(viewsets.ModelViewSet):
+    queryset = Investigador.objects.all()
+    serializer_class = InvestigadorSerializer

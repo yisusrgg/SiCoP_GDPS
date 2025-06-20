@@ -1,6 +1,6 @@
 from apps.proyecto.models import Proyecto
 from rest_framework import viewsets, permissions
-from .serializer import ProyectoSerializer
+from .serializers import ProyectoSerializer
 from rest_framework import filters  
 
 class ProyectoViewSet(viewsets.ModelViewSet):

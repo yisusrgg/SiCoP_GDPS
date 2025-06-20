@@ -1,7 +1,8 @@
-from rest_framework.routers import DefaultRouter
-from apps.colaboradores.api.api import ColaboradoresViewSet
+from django.urls import path
+from apps.colaboradores.views import ColaboradorListCreateAPIView, ColaboradorRetrieveUpdateDestroyAPIView
 
-router = DefaultRouter()
-router.register(r'colaboradores', ColaboradoresViewSet, basename='colaboradores')
-
-urlpatterns = router.urls
+urlpatterns = [
+    path('', ColaboradorListCreateAPIView.as_view(), name='colaborador-list-create'),  # Para /colaboradores/
+    path('colaboradores/', ColaboradorListCreateAPIView.as_view(), name='colaborador-list-create'),
+    path('colaboradores/<int:pk>/', ColaboradorRetrieveUpdateDestroyAPIView.as_view(), name='colaborador-detail'),
+]

@@ -47,7 +47,7 @@ function InvRegistro() {
 
   const [carreras, setCarreras] = useState([]);
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/carrera/carreras/')
+    fetch('http://127.0.0.1:8000/carrera/')
       .then(response => response.json())
       .then(data => setCarreras(data));
   }, []);

@@ -1,10 +1,10 @@
 from django.urls import path, include
 from rest_framework import routers
-from apps.convocatoria.api import api 
+from apps.convocatoria.views import ConvocatoriaViewSet
 
 router = routers.DefaultRouter()
-router.register(r'addConvocatoria', api.ConvocatoriaViewSet, 'addConvocatoria')
+router.register(r'convocatorias', ConvocatoriaViewSet, basename='convocatoria')
 
 urlpatterns = [
-    path("", include(router.urls))
+    path('', include(router.urls)),
 ]

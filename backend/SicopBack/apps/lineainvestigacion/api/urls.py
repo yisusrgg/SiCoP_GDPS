@@ -1,12 +1,12 @@
 from django.urls import path, include
 from rest_framework import routers
-from .api import LineaInvestigacionViewSet
+from apps.lineainvestigacion.views import LineaInvestigacionViewSet
 
 router = routers.DefaultRouter()
-router.register(r'', LineaInvestigacionViewSet, 'addlineainvestigacion')
+router.register(r'lineas', LineaInvestigacionViewSet, basename='lineainvestigacion')
 
 urlpatterns = [
-    path("", include(router.urls))
+    path("", include(router.urls)),
 ]
 
 
