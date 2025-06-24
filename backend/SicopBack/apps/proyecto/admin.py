@@ -1,4 +1,11 @@
+# apps/proyecto/admin.py
 from django.contrib import admin
-from .models import Proyecto
+from .models import Proyecto, MetaProyecto
 
-admin.site.register(Proyecto)
+class MetaProyectoInline(admin.TabularInline):
+    model = MetaProyecto
+    extra = 1
+
+@admin.register(Proyecto)
+class ProyectoAdmin(admin.ModelAdmin):
+    inlines = [MetaProyectoInline]

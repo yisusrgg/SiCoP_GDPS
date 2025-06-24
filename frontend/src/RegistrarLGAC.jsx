@@ -1,5 +1,6 @@
-import React from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { getCarreras } from "./api/carrera.api";
+import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -20,10 +21,23 @@ function RegistrarLGAC() {
   const {
     register,
     handleSubmit,
+    setValue,
+    control,
     formState: { errors },
   } = useForm();
 
-  // Cambia la ruta a la correcta
+  const [carreras, setCarreras] = useState([]);
+  const [carreraSeleccionada, setCarreraSeleccionada] = useState("");
+
+  useEffect(() => {
+    getCarreras()
+      .then(data => setCarreras(data))
+      .catch(error => {
+        console.error("Error al obtener carreras:", error);
+        setCarreras([]);
+      });
+  }, []);
+
   const onSubmit = (data) => {
     navigate("/Administracion/LGAC");
   };
@@ -77,17 +91,24 @@ function RegistrarLGAC() {
                 <label className="col-form-label">Carrera</label>
                 <FormControl fullWidth error={!!errors.carrera}>
                   <InputLabel>Carrera</InputLabel>
-                  <Select
-                    label="Carrera"
+                  <Controller
+                    name="carrera"
+                    control={control}
                     defaultValue=""
-                    {...register("carrera", { required: true })}
-                  >
-                    <MenuItem value="Sistemas">Ingeniería en Sistemas Computacionales</MenuItem>
-                    <MenuItem value="Industrial">Ingeniería Industrial</MenuItem>
-                    <MenuItem value="Civil">Ingeniería Civil</MenuItem>
-                    <MenuItem value="Biología">Lic. en Biología</MenuItem>
-                    <MenuItem value="Computación">Lic. en Ciencias de la Computación</MenuItem>
-                  </Select>
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        label="Carrera"
+                      >
+                        {carreras.map((carrera) => (
+                          <MenuItem key={carrera.claveCarrera} value={carrera.claveCarrera}>
+                            {carrera.nombreCarrera}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>

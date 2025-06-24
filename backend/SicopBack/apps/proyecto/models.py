@@ -132,7 +132,14 @@ class Proyecto(models.Model):
         null=True, 
         blank=True, 
         default=None
-    ),
+    )
+    
+    metas = models.ManyToManyField(
+        'metas.Metas',
+        through='MetaProyecto',
+        related_name='proyectos'
+    )
+    
     claveCarrera = models.ForeignKey(
          'carrera.Carrera',
          to_field='claveCarrera',
@@ -157,3 +164,11 @@ class Proyecto(models.Model):
 
     def __str__(self):
         return self.nombreProyecto
+    
+class MetaProyecto(models.Model):
+    proyecto = models.ForeignKey('Proyecto', on_delete=models.CASCADE)
+    meta = models.ForeignKey('metas.Metas', on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.proyecto} - {self.meta} ({self.cantidad})"

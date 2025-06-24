@@ -3,7 +3,7 @@ from apps.carrera.models import Carrera
 from apps.carrera.api.serializers import CarreraSerializer
 
 class CarreraListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Carrera.objects.all()
+    queryset = Carrera.objects.all().order_by('nombreCarrera')
     serializer_class = CarreraSerializer
 
 class CarreraRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):

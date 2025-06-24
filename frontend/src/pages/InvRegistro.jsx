@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { getCarreras } from "../api/carrera.api";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
@@ -46,10 +47,14 @@ function InvRegistro() {
   });
 
   const [carreras, setCarreras] = useState([]);
+
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/carrera/')
-      .then(response => response.json())
-      .then(data => setCarreras(data));
+    getCarreras()
+      .then(data => setCarreras(data))
+      .catch(error => {
+        console.error("Error al obtener carreras:", error);
+        setCarreras([]);
+      });
   }, []);
 
   return (
@@ -185,10 +190,8 @@ function InvRegistro() {
                   <InputLabel style={{ fontSize: "1rem" }}>Carrera</InputLabel>
                   <CustomSelect
                     label="Carrera"
-                    defaultValue=""
-                    error={!!errors.career}
                     {...register("career", { required: true })}
-                    style={{ fontSize: "1rem" }}
+                    error={!!errors.career}
                     endAdornment={
                       errors.career ? (
                         <InputAdornment position="end">
@@ -199,7 +202,7 @@ function InvRegistro() {
                   >
                     <MenuItem value="">Selecciona una carrera</MenuItem>
                     {carreras.map((carrera) => (
-                      <MenuItem key={carrera.claveCarrera} value={carrera.claveCarrera}>
+                      <MenuItem key={carrera.claveCarrera ?? carrera.id} value={carrera.claveCarrera ?? carrera.id}>
                         {carrera.nombreCarrera}
                       </MenuItem>
                     ))}

@@ -19,12 +19,14 @@ class LineaInvestigacion(models.Model):
             'max_length': 'La institución de registro no puede exceder 100 caracteres.'
         }
     )
-    # claveCarrera = models.ForeignKey(
-    #     'carrera.Carrera',  # Ajusta el nombre de la app y modelo si es diferente
-    #     to_field='claveCarrera',
-    #     db_column='claveCarrera',
-    #     on_delete=models.CASCADE
-    # )
+    claveCarrera = models.ForeignKey(
+        'carrera.Carrera', 
+        to_field='claveCarrera',
+        db_column='claveCarrera',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.nombre

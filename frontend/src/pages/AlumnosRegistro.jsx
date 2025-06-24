@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from "react";
+import { getCarreras } from "../api/carrera.api";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
@@ -38,11 +40,22 @@ function AlumnosRegistro() {
     formState: { errors },
   } = useForm();
 
+  const [carreras, setCarreras] = useState([]);
+
   const onSubmit = handleSubmit(async (data) => {
     const res = await createAlumno(data);
     console.log(res);
     navigate("/Detalles/Alumnos");
   });
+
+  useEffect(() => {
+    getCarreras()
+      .then(data => setCarreras(data))
+      .catch(error => {
+        console.error("Error al obtener carreras:", error);
+        setCarreras([]);
+      });
+  }, []);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -150,27 +163,12 @@ function AlumnosRegistro() {
                       ) : null
                     }
                   >
-                    <MenuItem value="1">
-                      Ingeniería en Sistemas Computacionales
-                    </MenuItem>
-                    <MenuItem value="2">
-                      Ingeniería en Sistemas Automotrices
-                    </MenuItem>
-                    <MenuItem value="3">Ingeniería Industrial</MenuItem>
-                    <MenuItem value="4">
-                      Ingeniería en Gestión Empresarial
-                    </MenuItem>
-                    <MenuItem value="5">
-                      Ingeniería Electronica
-                    </MenuItem>
-                    <MenuItem value="6">
-                      Ingeniería en Gestión Empresarial
-                    </MenuItem>
-                    <MenuItem value="6">
-                      Ingeniería en Semiconductores
-                    </MenuItem>
-                    <MenuItem value="7">Ingeniería Ambiental</MenuItem>
-                    <MenuItem value="8">Gastronomía</MenuItem>
+                    <MenuItem value="">Selecciona una carrera</MenuItem>
+                    {carreras.map((carrera) => (
+                      <MenuItem key={carrera.claveCarrera} value={carrera.claveCarrera}>
+                        {carrera.nombreCarrera}
+                      </MenuItem>
+                    ))}
                   </CustomSelect>
                 </FormControl>
               </Grid>
