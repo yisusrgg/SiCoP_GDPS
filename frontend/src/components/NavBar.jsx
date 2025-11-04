@@ -12,7 +12,7 @@ export default function NavBar({ user }) {
         height: "60px",
         display: "flex",
         alignItems: "center",
-        position: "fixed",  // Fijar en la parte superior
+        position: "fixed",
         top: 0,
         zIndex: 1300 
       }}
@@ -54,7 +54,7 @@ export default function NavBar({ user }) {
                 </div> : ""}
                 <li><hr class="dropdown-divider" /></li>
                 <a className="dropdown-item" href="#">
-                  Cerrar sesión
+                  <Link className="dropdown-item" to={"../"}>Cerrar Sesion</Link>
                 </a>
               </li>
             </ul>
