@@ -43,9 +43,31 @@ function AlumnosRegistro() {
   const [carreras, setCarreras] = useState([]);
 
   const onSubmit = handleSubmit(async (data) => {
-    const res = await createAlumno(data);
-    console.log(res);
-    navigate("/Detalles/Alumnos");
+    console.log("AlumnosRegistro: onSubmit invoked", data);
+    // Mapear los campos del formulario a los nombres esperados por el backend
+    const payload = {
+      noControl: data.controlN,
+      nombre: data.name,
+      apellidos: data.last_name,
+      correo: data.email,
+      telefono: data.phone,
+      claveCarrera: data.career || null,
+      // claveProyecto se omite (null) — agregar si es necesario
+    };
+
+    try {
+      console.log("AlumnosRegistro: payload ->", payload);
+      const res = await createAlumno(payload);
+      console.log("createAlumno response:", res);
+      navigate("/CrudEstudiantes");
+    } catch (error) {
+      console.error("Error creating alumno:", error);
+      if (error.response) {
+        console.error("Backend response:", error.response.data);
+      }
+      // Mostrar feedback mínimo al usuario (puedes cambiar a Snackbar más adelante)
+      alert("Error al registrar el alumno. Revisa la consola para más detalles.");
+    }
   });
 
   useEffect(() => {

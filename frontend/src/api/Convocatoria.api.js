@@ -1,21 +1,23 @@
 import axios from "axios";
 
-//verifucar link de backend
+// Usar la ruta real del backend: /convocatoria/convocatorias/
 const ConvocatoriaUrl = axios.create({
-    baseURL: "http://localhost:8000/call/addCall",
+    baseURL: "http://127.0.0.1:8000/convocatoria/convocatorias/",
 });
 
-export const getAllConovocatorias = () => {
-    return ConvocatoriaUrl.get("/");
-};
+export const getAllConovocatorias = () => ConvocatoriaUrl.get("/");
 
-export const getAllCall = () => ConvocatoriaUrl.get("http://127.0.0.1:8000/call/");
+export const getCall = (id) => ConvocatoriaUrl.get(`/${id}/`);
 
-export const getCall = (id) =>ConvocatoriaUrl.get(`/${id}/`);
+// createCall acepta FormData (multipart/form-data) cuando se envía un archivo
+export const createCall = (formData) =>
+    ConvocatoriaUrl.post("/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
 
-export const createCall = (call) => ConvocatoriaUrl.post("http://127.0.0.1:8000/call/", call);
+// Alias con nombre esperado en algunos componentes
+export const createConvocatoria = (formData) => createCall(formData);
 
-export const deleteCall = (id) => ConvocatoriaUrl.delete(`http://127.0.0.1:8000/call/addCall/${id}/`);
+export const deleteCall = (id) => ConvocatoriaUrl.delete(`/${id}/`);
 
-export const updateCall = (id,call) => ConvocatoriaUrl.put(`/${id}/`,call,'/');
-//Verificar con backend el acceso
+export const updateCall = (id, call) => ConvocatoriaUrl.put(`/${id}/`, call);

@@ -1,13 +1,15 @@
 from apps.convocatoria.models import Convocatoria
 from rest_framework import viewsets, filters
+from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import ConvocatoriaSerializer
 
 
 class ConvocatoriaViewSet(viewsets.ModelViewSet):
     queryset = Convocatoria.objects.all()
     serializer_class = ConvocatoriaSerializer
-    filter_backends = [filters.SearchFilter,filters.OrderingFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['convocatoria']
     ordering_fields = ['convocatoria']
+    # Permitir recibir multipart/form-data (subida de archivos)
+    parser_classes = [MultiPartParser, FormParser]
 
- 
