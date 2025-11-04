@@ -9,10 +9,18 @@ function ConvocatoriasCard({
   nombre = "Lorem ipsum dolor",
   investigador = "Lorem ipsum dolor",
   descripcion = "Anim ipsum proident nisi eu laboris consectetur eu proident sint sunt reprehenderit exercitation sunt. Non irure velit sint ipsum amet. Dolor laborum nostrud elit adipisicing dolore Lorem laborum eiusmod. Eiusmod reprehenderit do qui velit. Lorem qui proident nostrud culpa tempor in elit voluptate in exercitation ad excepteur. Ea exercitation esse veniam aute. Non tempor et cupidatat aliquip cillum esse.",
+  to = null,
+  onClick = null,
   }){
   const navigate = useNavigate();
+  const handleClick = () => {
+    if (to) return navigate(to);
+    if (onClick) return onClick();
+    return navigate('../Administracion/ConvocatoriasDetalle');
+  };
+
   return (
-    <Card onClick={() => navigate('../Administracion/ConvocatoriasDetalle')} style={{ height: "100%" }}>
+    <Card onClick={handleClick} style={{ height: "100%", cursor: 'pointer' }}>
       <CardActionArea>
         <CardHeader style={{backgroundColor: "#E9F1FE"}}></CardHeader>
         <CardContent style={{ width: "100%", height: "60%" }}>

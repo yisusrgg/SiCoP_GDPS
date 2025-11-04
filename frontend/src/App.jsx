@@ -34,7 +34,7 @@ import ColaborRegistro from "./pages/ColaborRegistro";
 import VinculacionFinanciamiento from "./Vinculacion_Financiamiento";
 import RegistrarLGAC from "./RegistrarLGAC";
 import RegistroInvestigadores from './pages/Administrador/RegistroInvestigadores';
-import ConvocatoriasInvestigador from './pages/ConvocatoriasInvestigador';
+import ConvocatoriasInvestigador from './pages/Investigador/ConvocatoriasInvestigador';
 import RegistroProyecto1 from "./pages/RegistroProyecto1";
 import RegistroProyecto2 from "./pages/RegistroProyecto2";
 import Login from "./Login";
@@ -79,8 +79,8 @@ function App() {
         <Route path="/VinculacionFinanciamiento" element={<VinculacionFinanciamiento />} />
         <Route path="/Administracion/RegistroLGAC" element={<RegistrarLGAC />} />
         <Route path="/Administracion/RegistroInvestigador" element={<RegistroInvestigadores />} />
-        <Route path="/ConvocatoriasInvestigador" element={<ConvocatoriasInvestigador />} />
-        <Route path="/ConvocatoriaDetalle/:id" element={<ConvocatoriaDetalle />} />
+        <Route path="/Investigador/Convocatorias" element={<ConvocatoriasInvestigador />} />
+        <Route path="/Investigador/ConvocatoriaDetalle/:id" element={<ConvocatoriaDetalle />} />
         <Route path="/RegistroProyecto1" element={<RegistroProyecto1 />} />
         <Route path="/RegistroProyecto2" element={<RegistroProyecto2 />} />
         <Route path="/" element={<Login />} />

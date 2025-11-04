@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import NavBar from "../../components/NavBar";
 import Footer from "../../components/Footer";
-import { Card, Spinner, Alert, Row, Col, ListGroup} from 'react-bootstrap';
+import { Card, Spinner, Alert, Row, Col, ListGroup, Button } from 'react-bootstrap';
 
 export default function ConvocatoriaDetalle() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -47,17 +48,10 @@ export default function ConvocatoriaDetalle() {
         )}
 
         {data && (
+          <>
+            <h2 className="text-center my-3" style={{ fontWeight: 700 }}>{data.convocatoria || data.callN || `Convocatoria ${id}`}</h2>
           <Card style={{ textAlign: 'left' }}>
             <Card.Body>
-              <Row>
-                <Col>
-                  <h3>{data.callN || data.callName || `Convocatoria ${id}`}</h3>
-                </Col>
-                <Col className="text-end">
-                  <small className="text-muted">ID: {data.id}</small>
-                </Col>
-              </Row>
-
               <ListGroup variant="flush" className="mt-3">
                 <ListGroup.Item>
                   <Row>
@@ -136,11 +130,20 @@ export default function ConvocatoriaDetalle() {
                   </Row>
                 </ListGroup.Item>
               </ListGroup>
-
-              <div className="mt-3">
-              </div>
             </Card.Body>
           </Card>
+
+          <div className="text-center mt-3">
+            <Button variant="secondary" className="mx-2" onClick={() => navigate(-1)}>Regresar</Button>
+            <Button variant="primary" className="mx-2" onClick={() => {
+              if (data && data.archivo) {
+                window.open(data.archivo, '_blank');
+              } else {
+                window.alert('Función de aplicar no disponible.');
+              }
+            }}>Aplicar a convocatoria</Button>
+          </div>
+          </>
         )}
       </div>
       <Footer />
