@@ -34,4 +34,8 @@ urlpatterns = [
     path('metas/', include('apps.metas.api.urls')),
     path('credenciales/', include('apps.credenciales.api.urls')),
     path('proyecto/', include('apps.proyecto.api.urls')),
+
+    path('admin/', admin.site.urls),
+    # === NECESITAS ESTA LÍNEA PARA LAS RUTAS BÁSICAS DE AUTENTICACIÓN ===
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

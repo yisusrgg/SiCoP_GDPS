@@ -132,3 +132,8 @@ STATIC_URL = '/static/'
 """
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 """
+
+# Configuración de redirección de autenticación
+LOGIN_REDIRECT_URL = '/'      # URL a donde redirigir después de iniciar sesión
+LOGOUT_REDIRECT_URL = '/'     # URL a donde redirigir después de cerrar sesión
+LOGIN_URL = '/accounts/login/' # La URL de tu vista de inicio de sesión

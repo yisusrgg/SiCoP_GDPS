@@ -14,7 +14,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'SiCoP_test',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': 'Natzu1:)',
         'HOST': 'localhost',  
         'PORT': '3306',
     }
