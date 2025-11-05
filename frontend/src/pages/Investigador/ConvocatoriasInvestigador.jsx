@@ -7,6 +7,23 @@ export default function ConvocatoriasInvestigador({ user = { type: "Investigador
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  const isActiveConvocatoria = (c) => {
+    if (!c) return false;
+    const startRaw = c.fechaInicioConvocatoria;
+    const endRaw = c.fechaFinConvocatoria;
+    if (!startRaw || !endRaw) return false;
+    const start = new Date(startRaw);
+    const end = new Date(endRaw);
+    if (isNaN(start) || isNaN(end)) return false;
+    const today = new Date();
+    // Normalizar horas para comparar solo fechas (evitar problemas de timezone)
+    const y = today.getFullYear(), m = today.getMonth(), d = today.getDate();
+    const todayMid = new Date(y, m, d);
+    const startMid = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const endMid = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    return todayMid.getTime() >= startMid.getTime() && todayMid.getTime() <= endMid.getTime();
+  };
 
   useEffect(() => {
     const fetchConvocatorias = async () => {
@@ -61,19 +78,21 @@ export default function ConvocatoriasInvestigador({ user = { type: "Investigador
             columns={{ xs: 4, sm: 8, md: 12 }}
             style={{ padding: 30 }}
           >
-            {items.length === 0 && (
-              <Typography variant="body1">No hay convocatorias disponibles.</Typography>
-            )}
-            {items.map((c) => (
-              <Grid xs={2} sm={4} md={4} className="p-2" key={c.clave_convocatoria || c.id}>
-                <ConvocatoriasCard
-                  nombre={c.convocatoria}
-                  investigador={c.institucionFinanciamiento}
-                  descripcion={c.descripcion}
-                  to={`../Investigador/ConvocatoriaDetalle/${c.clave_convocatoria || c.id}`}
-                />
-              </Grid>
-            ))}
+            {/** Filtrar solo convocatorias activas según fecha de convocatoria (ignorar financiamiento) */}
+            {(() => {
+              const active = items.filter(isActiveConvocatoria);
+              if (active.length === 0) return (<Typography variant="body1">No hay convocatorias disponibles.</Typography>);
+              return active.map((c) => (
+                <Grid xs={2} sm={4} md={4} className="p-2" key={c.clave_convocatoria || c.id}>
+                  <ConvocatoriasCard
+                    nombre={c.convocatoria}
+                    investigador={c.institucionFinanciamiento}
+                    descripcion={c.descripcion}
+                    to={`../Investigador/ConvocatoriaDetalle/${c.clave_convocatoria || c.id}`}
+                  />
+                </Grid>
+              ));
+            })()}
           </Grid>
         )}
       </div>

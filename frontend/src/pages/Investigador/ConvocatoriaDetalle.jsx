@@ -11,13 +11,24 @@ export default function ConvocatoriaDetalle() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const fechaEnRango = (startRaw, endRaw) => {
+    if (!startRaw || !endRaw) return false;
+    const start = new Date(startRaw);
+    const end = new Date(endRaw);
+    if (isNaN(start) || isNaN(end)) return false;
+    const today = new Date();
+    const y = today.getFullYear(), m = today.getMonth(), d = today.getDate();
+    const todayMid = new Date(y, m, d);
+    const startMid = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const endMid = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    return todayMid.getTime() >= startMid.getTime() && todayMid.getTime() <= endMid.getTime();
+  };
   useEffect(() => {
     if (!id) return;
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        // endpoint updated to match backend app 'convocatoria' router
         const res = await fetch(`http://127.0.0.1:8000/convocatoria/convocatorias/${id}/`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
@@ -31,10 +42,13 @@ export default function ConvocatoriaDetalle() {
     fetchData();
   }, [id]);
 
+  const financiamientoActivo = data ? fechaEnRango(data.fechaInicioFinanciamiento, data.fechaFinFinanciamiento) : false;
+
   return (
     <div className="max-w-xl mx-auto text-center">
       <NavBar />
-      <div style={{ paddingTop: '40px', paddingBottom: '40px' }} className="container">
+      {/* Contenedor centrado con ancho máximo para que título y botones se aprecien mejor */}
+      <div style={{ paddingTop: '40px', paddingBottom: '40px', maxWidth: '900px', margin: '0 auto' }} className="container">
         {loading && (
           <div className="text-center">
             <Spinner animation="border" role="status">
@@ -49,8 +63,9 @@ export default function ConvocatoriaDetalle() {
 
         {data && (
           <>
-            <h2 className="text-center my-3" style={{ fontWeight: 700 }}>{data.convocatoria || data.callN || `Convocatoria ${id}`}</h2>
-          <Card style={{ textAlign: 'left' }}>
+            <br />
+            <h2 className="text-center my-3" style={{ fontWeight: 700, fontSize: '30px', fontStyle: 'bold' }}>{data.convocatoria || data.callN || `Convocatoria ${id}`}</h2>
+          <Card style={{ textAlign: 'left', height: '60%' }}>
             <Card.Body>
               <ListGroup variant="flush" className="mt-3">
                 <ListGroup.Item>
@@ -84,14 +99,14 @@ export default function ConvocatoriaDetalle() {
                 <ListGroup.Item>
                   <Row>
                     <Col sm={4}><strong>Inicio (financiamiento)</strong></Col>
-                    <Col>{formatDate(data.fechaInicioFinanciamiento)}</Col>
+                    <Col style={!financiamientoActivo ? { color: 'red' } : {}}>{formatDate(data.fechaInicioFinanciamiento)}</Col>
                   </Row>
                 </ListGroup.Item>
 
                 <ListGroup.Item>
                   <Row>
                     <Col sm={4}><strong>Fin (financiamiento)</strong></Col>
-                    <Col>{formatDate(data.fechaFinFinanciamiento)}</Col>
+                    <Col style={!financiamientoActivo ? { color: 'red' } : {}}>{formatDate(data.fechaFinFinanciamiento)}</Col>
                   </Row>
                 </ListGroup.Item>
 
@@ -112,7 +127,7 @@ export default function ConvocatoriaDetalle() {
                 <ListGroup.Item>
                   <Row>
                     <Col sm={4}><strong>Presupuesto</strong></Col>
-                    <Col>{data.presupuesto != null ? `$ ${data.presupuesto}` : '-'}</Col>
+                    <Col style={!financiamientoActivo ? { color: 'red' } : {}}>{data.presupuesto != null ? `$ ${data.presupuesto}` : '-'}</Col>
                   </Row>
                 </ListGroup.Item>
 
@@ -133,7 +148,7 @@ export default function ConvocatoriaDetalle() {
             </Card.Body>
           </Card>
 
-          <div className="text-center mt-3">
+          <div className="text-center mt-3" style={{ marginBottom: '40px' }}>
             <Button variant="secondary" className="mx-2" onClick={() => navigate(-1)}>Regresar</Button>
             <Button variant="primary" className="mx-2" onClick={() => {
               if (data && data.archivo) {
@@ -153,7 +168,6 @@ export default function ConvocatoriaDetalle() {
 
 function formatDate(value){
   if(!value) return '-';
-  // try to parse YYYY-MM-DD or ISO
   try{
     const d = new Date(value);
     if(isNaN(d)) return value;
