@@ -7,7 +7,18 @@ const ConvocatoriaUrl = axios.create({
 
 export const getAllConovocatorias = () => ConvocatoriaUrl.get("/");
 
+// Correct function name and return only the data array
+export const getAllConvocatorias = async () => {
+    const resp = await ConvocatoriaUrl.get("/");
+    return resp.data;
+};
+
 export const getCall = (id) => ConvocatoriaUrl.get(`/${id}/`);
+
+export const getConvocatoria = async (id) => {
+    const resp = await ConvocatoriaUrl.get(`/${id}/`);
+    return resp.data;
+};
 
 // createCall acepta FormData (multipart/form-data) cuando se envía un archivo
 export const createCall = (formData) =>
