@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import { Button, CardActionArea, CardHeader } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+<<<<<<< HEAD
 function ConvocatoriasCard({ convocatoria, onClick, isActive = false }) {
   const navigate = useNavigate();
 
@@ -54,6 +55,33 @@ function ConvocatoriasCard({ convocatoria, onClick, isActive = false }) {
   <CardHeader sx={{ backgroundColor: '#E9F1FE', '& .MuiCardHeader-content': { margin: 0 }, height: 36, borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }} />
   <CardContent sx={{ width: '100%', height: '60%' }}>
           <Typography gutterBottom variant="h5" component="div" style={{ textAlign: "start" }}>
+=======
+function ConvocatoriasCard({
+  nombre = "Lorem ipsum dolor",
+  investigador = "Lorem ipsum dolor",
+  descripcion = "Anim ipsum proident nisi eu laboris consectetur eu proident sint sunt reprehenderit exercitation sunt. Non irure velit sint ipsum amet. Dolor laborum nostrud elit adipisicing dolore Lorem laborum eiusmod. Eiusmod reprehenderit do qui velit. Lorem qui proident nostrud culpa tempor in elit voluptate in exercitation ad excepteur. Ea exercitation esse veniam aute. Non tempor et cupidatat aliquip cillum esse.",
+  to = null,
+  onClick = null,
+  }){
+  const navigate = useNavigate();
+  const handleClick = () => {
+    if (to) return navigate(to);
+    if (onClick) return onClick();
+    return navigate('../Administracion/ConvocatoriasDetalle');
+  };
+
+  return (
+    <Card onClick={handleClick} style={{ height: "100%", cursor: 'pointer' }}>
+      <CardActionArea>
+        <CardHeader style={{backgroundColor: "#E9F1FE"}}></CardHeader>
+        <CardContent style={{ width: "100%", height: "60%" }}>
+          <Typography
+            gutterBottom
+            variant="h5"
+            component="div"
+            style={{ textAlign: "start" }}
+          >
+>>>>>>> 82048c16ab605e90f76de90150af5960050a2648
             {nombre}
           </Typography>
           <Typography variant="body1" color="text.secondary" style={{ textAlign: "start" }}>
