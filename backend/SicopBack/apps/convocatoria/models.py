@@ -75,6 +75,10 @@ class Convocatoria(models.Model):
             'max_length': 'Los requisitos no pueden exceder 500 caracteres.',
         }
     )
+    activa = models.BooleanField(
+        default=False,
+        help_text='Indica si la convocatoria está activa. Solo puede ponerse True si la fecha actual está entre fechaInicioConvocatoria y fechaFinConvocatoria.'
+    )
 
     def __str__(self):
         return self.convocatoria
