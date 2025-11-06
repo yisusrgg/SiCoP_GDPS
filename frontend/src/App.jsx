@@ -39,6 +39,7 @@ import RegistroProyecto1 from "./pages/RegistroProyecto1";
 import RegistroProyecto2 from "./pages/RegistroProyecto2";
 import Login from "./Login";
 import ConvocatoriaDetalle from './pages/Investigador/ConvocatoriaDetalle';
+import Registro from './Registro';
 //import ST from "./pages/students/StudentsList";
 
 function App() {
@@ -84,6 +85,7 @@ function App() {
         <Route path="/RegistroProyecto1" element={<RegistroProyecto1 />} />
         <Route path="/RegistroProyecto2" element={<RegistroProyecto2 />} />
         <Route path="/" element={<Login />} />
+        <Route path="/Registro" element={<Registro />} />
       </Routes>
       </div>
       <Footer/>

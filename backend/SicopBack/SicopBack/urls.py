@@ -18,14 +18,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('usuario/', include('apps.users.api.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
+
+    path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    path('api/usuario/', include('apps.users.api.urls')), 
+    
     path('Files/', include('apps.Files.api.urls')),
-    
-    
-    #nuevo
     path('carrera/', include('apps.carrera.api.urls')),
     path('colaboradores/', include('apps.colaboradores.api.urls')),
     path('convocatoria/', include('apps.convocatoria.api.urls')),
@@ -36,9 +43,6 @@ urlpatterns = [
     path('metas/', include('apps.metas.api.urls')),
     path('credenciales/', include('apps.credenciales.api.urls')),
     path('proyecto/', include('apps.proyecto.api.urls')),
-
-    path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 if settings.DEBUG:
