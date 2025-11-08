@@ -27,6 +27,7 @@ import ColaborRegistro from "./pages/ColaborRegistro";
 import VinculacionFinanciamiento from "./Vinculacion_Financiamiento";
 import RegistrarLGAC from "./pages/Administrador/RegistrarLGAC";
 import RegistroInvestigadores from './pages/Administrador/RegistroInvestigadores';
+import RequireRole from './components/RequireRole';
 import ConvocatoriasInvestigador from './pages/ConvocatoriasInvestigador';
 import RegistroProyecto1 from "./pages/RegistroProyecto1";
 import RegistroProyecto2 from "./pages/RegistroProyecto2";
@@ -62,20 +63,60 @@ function App() {
             <Routes>
 
               {/* ADMINISTRADOR */}
-              <Route path='/Administracion/Convocatorias' element={<Convocatorias />} />
-              <Route path='/Administracion/Investigadores' element={<CrudInvestigadores />} />
-              <Route path='/Administracion/LGAC' element={<CrudLGAC />} />
-              <Route path="/Administracion/RegistroLGAC" element={<RegistrarLGAC />} />
-              <Route path='/Administracion/Proyectos' element={<CrudProyectos />} />
+              <Route path='/Administracion/Convocatorias' element={
+                <RequireRole allowedRoles={["Administrador"]}>
+                  <Convocatorias />
+                </RequireRole>
+              } />
+              <Route path='/Administracion/Investigadores' element={
+                <RequireRole allowedRoles={["Administrador"]}>
+                  <CrudInvestigadores />
+                </RequireRole>
+              } />
+              <Route path='/Administracion/LGAC' element={
+                <RequireRole allowedRoles={["Administrador"]}>
+                  <CrudLGAC />
+                </RequireRole>
+              } />
+              <Route path="/Administracion/RegistroLGAC" element={
+                <RequireRole allowedRoles={["Administrador"]}>
+                  <RegistrarLGAC />
+                </RequireRole>
+              } />
+              <Route path='/Administracion/Proyectos' element={
+                <RequireRole allowedRoles={["Administrador"]}>
+                  <CrudProyectos />
+                </RequireRole>
+              } />
               <Route path="/EditarProyecto" element={<EditarProyectos />} />
-              <Route path="/Administracion/RegistroInvestigador" element={<RegistroInvestigadores />} />
-              <Route path='/Administracion/RegistroConvocatorias' element={<RegistroConvocatorias />} />
-              <Route path="/Administracion/RegistroColaborador" element={<ColaborRegistro />} />
+              <Route path="/Administracion/RegistroInvestigador" element={
+                <RequireRole allowedRoles={["Administrador"]}>
+                  <RegistroInvestigadores />
+                </RequireRole>
+              } />
+              <Route path='/Administracion/RegistroConvocatorias' element={
+                <RequireRole allowedRoles={["Administrador"]}>
+                  <RegistroConvocatorias />
+                </RequireRole>
+              } />
+              <Route path="/Administracion/RegistroColaborador" element={
+                <RequireRole allowedRoles={["Administrador"]}>
+                  <ColaborRegistro />
+                </RequireRole>
+              } />
 
 
               {/* INVESTIGADOR */}
-              <Route path="/ConvocatoriasInvestigador" element={<ConvocatoriasInvestigador />} />
-              <Route path='/Proyectos' element={<Proyectos />} />
+              <Route path="/ConvocatoriasInvestigador" element={
+                <RequireRole allowedRoles={["Investigador"]}>
+                  <ConvocatoriasInvestigador />
+                </RequireRole>
+              } />
+              <Route path='/Proyectos' element={
+                <RequireRole allowedRoles={["Investigador"]}>
+                  <Proyectos />
+                </RequireRole>
+              } />
 
               {/* REGISTRO DE PROYECTO */}
               <Route path="/RegistroProyecto1" element={<RegistroProyecto1 />} />

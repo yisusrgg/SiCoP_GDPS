@@ -1,9 +1,10 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000";
-
+// Use relative base URL so Vite dev server proxy (configured in vite.config.js)
+// can forward the requests to the Django backend. This makes cookies same-site
+// in development and avoids cross-site cookie restrictions.
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: '',
   withCredentials: true,
 });
 

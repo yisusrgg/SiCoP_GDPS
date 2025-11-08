@@ -8,8 +8,16 @@ export function AuthProvider({ children }) {
   const [access, setAccess] = useState(null);
 
   useEffect(() => {
-    const check = async () => {
+    const init = async () => {
       try {
+        // try to refresh access using the refresh cookie first (works if cookie present)
+        try {
+          await refreshAccess();
+        } catch (refreshErr) {
+          // refresh failed or no cookie; continue to check-auth which may return 401
+          // console.log('refresh failed at startup', refreshErr);
+        }
+
         const resp = await api.get('/credenciales/check-auth/');
         if (resp.data.is_authenticated) {
           setUser(resp.data.user);
@@ -20,7 +28,7 @@ export function AuthProvider({ children }) {
         setUser(null);
       }
     };
-    check();
+    init();
   }, []);
 
   // attach access token to axios headers when set

@@ -6,12 +6,18 @@ import { Button, CardActionArea, CardHeader, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 function ConvocatoriasCard({
-  nombre = "Lorem ipsum dolor",
-  investigador = "Lorem ipsum dolor",
-  descripcion = "Anim ipsum proident nisi eu laboris consectetur eu proident sint sunt reprehenderit exercitation sunt. Non irure velit sint ipsum amet. Dolor laborum nostrud elit adipisicing dolore Lorem laborum eiusmod. Eiusmod reprehenderit do qui velit. Lorem qui proident nostrud culpa tempor in elit voluptate in exercitation ad excepteur. Ea exercitation esse veniam aute. Non tempor et cupidatat aliquip cillum esse.",
+  convocatoria = null,
+  nombre = null,
+  investigador = null,
+  descripcion = null,
   to = null,
   onClick = null,
-  }){
+  isActive = false,
+}){
+  // support two calling styles: either pass a `convocatoria` object or individual props
+  const title = convocatoria?.convocatoria ?? nombre ?? "Sin título";
+  const author = convocatoria?.investigador ?? investigador ?? "Sin autor";
+  const desc = convocatoria?.descripcion ?? descripcion ?? "No hay descripción disponible.";
   const navigate = useNavigate();
   const handleClick = () => {
     if (to) return navigate(to);
@@ -30,14 +36,14 @@ function ConvocatoriasCard({
             component="div"
             style={{ textAlign: "start" }}
           >
-            {nombre}
+              {title}
           </Typography>
           <Typography
             variant="body1"
             color="text.secondary"
             style={{ textAlign: "start" }}
           >
-            {investigador}
+            {author}
           </Typography>
           <Typography
             variant="body2"
@@ -50,7 +56,7 @@ function ConvocatoriasCard({
               textOverflow: "ellipsis",
             }}
           >
-            {descripcion}
+            {desc}
           </Typography>
         </CardContent>
       </CardActionArea>

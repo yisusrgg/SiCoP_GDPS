@@ -22,7 +22,8 @@ export const doLogin = async (usuario, password) => {
 export const chechSession = async () => {
     try {
         const response = await api.get(API_URL + "check-auth/");
-        return response.data.authenticated;
+        // backend returns `is_authenticated`; tolerate both keys for robustness
+        return response.data.is_authenticated ?? response.data.authenticated ?? false;
     } catch (error) {
         return false;
     }

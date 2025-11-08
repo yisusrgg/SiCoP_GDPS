@@ -40,8 +40,12 @@ class CheckAuthView(APIView):
         if user:
             curp = None
             try:
-                investigador = Investigador.objects.get(user=user)
-                curp = investigador.curp
+                # Credenciales model links User -> Credenciales, and Investigador links to Credenciales
+                cred = Credenciales.objects.filter(user=user).first()
+                if cred:
+                    investigador = Investigador.objects.filter(id_Credencial=cred).first()
+                    if investigador:
+                        curp = investigador.curp
             except Investigador.DoesNotExist:
                 curp = None
             return Response({"is_authenticated": True, "user": {"username": user.username, "id": user.id, "curp": curp}})
