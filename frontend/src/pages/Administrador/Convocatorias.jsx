@@ -435,7 +435,6 @@ export default function Convocatorias({ user = { type: "Admin" } }) {
                 </Box>
               </Fade>
             </Modal>
-
           </Box>
         </Box>
       </Box>

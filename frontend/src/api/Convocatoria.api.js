@@ -1,34 +1,26 @@
-import axios from "axios";
+import api from './axiosInstance';
 
-// Usar la ruta real del backend: /convocatoria/convocatorias/
-const ConvocatoriaUrl = axios.create({
-    baseURL: "http://127.0.0.1:8000/convocatoria/convocatorias/",
-});
+const BASE = '/convocatoria/convocatorias';
 
-export const getAllConovocatorias = () => ConvocatoriaUrl.get("/");
+export const getAllConovocatorias = () => api.get(`${BASE}/`);
 
-// Correct function name and return only the data array
 export const getAllConvocatorias = async () => {
-    const resp = await ConvocatoriaUrl.get("/");
+    const resp = await api.get(`${BASE}/`);
     return resp.data;
 };
 
-export const getCall = (id) => ConvocatoriaUrl.get(`/${id}/`);
+export const getCall = (id) => api.get(`${BASE}/${id}/`);
 
 export const getConvocatoria = async (id) => {
-    const resp = await ConvocatoriaUrl.get(`/${id}/`);
+    const resp = await api.get(`${BASE}/${id}/`);
     return resp.data;
 };
 
-// createCall acepta FormData (multipart/form-data) cuando se envía un archivo
 export const createCall = (formData) =>
-    ConvocatoriaUrl.post("/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-    });
+    api.post(`${BASE}/`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-// Alias con nombre esperado en algunos componentes
 export const createConvocatoria = (formData) => createCall(formData);
 
-export const deleteCall = (id) => ConvocatoriaUrl.delete(`/${id}/`);
+export const deleteCall = (id) => api.delete(`${BASE}/${id}/`);
 
-export const updateCall = (id, call) => ConvocatoriaUrl.put(`/${id}/`, call);
+export const updateCall = (id, call) => api.put(`${BASE}/${id}/`, call);
