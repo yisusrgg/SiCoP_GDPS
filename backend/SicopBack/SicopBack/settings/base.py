@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -119,17 +120,21 @@ AUTH_USER_MODEL = 'users.User'
 
 #cors authorization
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173'
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+# ACTIVACION DEL CORS PARA QUE PUEDA LLEVARSE A CABO LAS COOKIES
+CORS_ALLOW_CREDENTIALS = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
-# Media files (uploads)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -137,7 +142,24 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 """
 
-# Configuración de redirección de autenticación
-LOGIN_REDIRECT_URL = '/'      # URL a donde redirigir después de iniciar sesión
-LOGOUT_REDIRECT_URL = '/accounts/login/'     # URL a donde redirigir después de cerrar sesión
-LOGIN_URL = '/accounts/login/' # La URL de tu vista de inicio de sesión
+
+
+# CONFIGURACION PARA QUE FUNCIONE LAS COOKIES
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'apps.credenciales.authentication.CookieJWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'AUTH_HEADER_TYPES': ('Bearer', ),  
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',), 
+}
