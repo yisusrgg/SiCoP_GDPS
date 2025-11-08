@@ -43,6 +43,7 @@ urlpatterns = [
     path('metas/', include('apps.metas.api.urls')),
     path('credenciales/', include('apps.credenciales.api.urls')),
     path('proyecto/', include('apps.proyecto.api.urls')),
+    path('credenciales/', include('apps.credenciales.urls'))
 ]
 
 if settings.DEBUG:
