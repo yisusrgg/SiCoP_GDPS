@@ -7,14 +7,14 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 expect.extend(matchers);
 
 // Mocks for child components to keep tests focused and fast
-vi.mock('../../../components/ConvocatoriasCard', () => ({
+vi.mock('../components/ConvocatoriasCard', () => ({
   default: ({ nombre }) => <div data-testid="card">{nombre}</div>,
 }));
-vi.mock('../../../components/SideBar', () => ({
+vi.mock('../components/SideBar', () => ({
   default: () => <div data-testid="sidebar" />,
 }));
 
-import ConvocatoriasInvestigador from '../ConvocatoriasInvestigador';
+import ConvocatoriasInvestigador from '../pages/Investigador/ConvocatoriasInvestigador';
 
 const originalFetch = global.fetch;
 

@@ -5,8 +5,8 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 expect.extend(matchers);
 
 // Mocks for layout components
-vi.mock('../../../components/NavBar', () => ({ default: () => <div data-testid="navbar" /> }));
-vi.mock('../../../components/Footer', () => ({ default: () => <div data-testid="footer" /> }));
+vi.mock('../components/NavBar', () => ({ default: () => <div data-testid="navbar" /> }));
+vi.mock('../components/Footer', () => ({ default: () => <div data-testid="footer" /> }));
 
 // Mock react-router hooks used by the component
 vi.mock('react-router-dom', async () => {
@@ -18,7 +18,7 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-import ConvocatoriaDetalle from '../ConvocatoriaDetalle';
+import ConvocatoriaDetalle from '../pages/Investigador/ConvocatoriaDetalle';
 
 const originalFetch = global.fetch;
 
