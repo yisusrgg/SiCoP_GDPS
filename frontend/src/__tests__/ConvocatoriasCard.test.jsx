@@ -14,7 +14,7 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-import ConvocatoriasCard from '../ConvocatoriasCard';
+import ConvocatoriasCard from '../components/ConvocatoriasCard';
 
 afterEach(() => {
   cleanup();
