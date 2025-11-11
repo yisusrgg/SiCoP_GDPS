@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
 import { vi, afterEach, test, expect, beforeEach } from 'vitest';
 import * as matchers from '@testing-library/jest-dom/matchers';
+import userEvent from '@testing-library/user-event';
 expect.extend(matchers);
 
 const navigateMock = vi.fn();
@@ -32,7 +33,7 @@ afterEach(() => {
 test('renderiza campos y botón de iniciar sesión', () => {
     render(<Login />);
 
-    expect(screen.getByText(/Iniciar Sesión/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Iniciar Sesión/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Ingrese su usuario/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Ingrese su contraseña/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Iniciar Sesión/i })).toBeInTheDocument();
@@ -48,11 +49,10 @@ test('no llama a la API si se envía el formulario vacío', async () => {
     });
 });
 
-test('login exitoso redirige según rol (Administrador) después de timeout', async () => {
+test('login exitoso redirige según rol (Administrador)', async () => {
+    const user = userEvent.setup();
     doLogin.mockResolvedValue(true);
     checkRol.mockResolvedValue({ Rol: 'Administrador' });
-
-    vi.useFakeTimers();
 
     render(<Login />);
 
@@ -60,41 +60,43 @@ test('login exitoso redirige según rol (Administrador) después de timeout', as
     const passwordInput = screen.getByPlaceholderText(/Ingrese su contraseña/i);
     const btn = screen.getByRole('button', { name: /Iniciar Sesión/i });
 
-    fireEvent.change(usuarioInput, { target: { value: 'usuario1' } });
-    fireEvent.change(passwordInput, { target: { value: 'pass1' } });
+    await user.type(usuarioInput, 'admin');
+    await user.type(passwordInput, 'admin');
+    await user.click(btn);
 
-    fireEvent.click(btn);
+    await waitFor(() => expect(doLogin).toHaveBeenCalledWith('admin', 'admin'), { timeout: 3000 });
+    await waitFor(() => expect(checkRol).toHaveBeenCalled(), { timeout: 3000 });
 
-    await waitFor(() => expect(doLogin).toHaveBeenCalledWith('usuario1', 'pass1'));
-    await waitFor(() => expect(checkRol).toHaveBeenCalled());
-
-    vi.advanceTimersByTime(2000);
-
-    expect(navigateMock).toHaveBeenCalledWith('/Administracion/Proyectos');
-
-    vi.useRealTimers();
+    await waitFor(() => {
+        expect(navigateMock).toHaveBeenCalledWith('/Administracion/Proyectos');
+    }, { timeout: 4000 });
 });
 
 test('login exitoso redirige a /Proyectos para rol no administrador', async () => {
+    const user = userEvent.setup();
     doLogin.mockResolvedValue(true);
-    checkRol.mockResolvedValue({ Rol: 'Usuario' });
-
-    vi.useFakeTimers();
+    checkRol.mockResolvedValue({ Rol: 'Investigador' });
 
     render(<Login />);
 
-    fireEvent.change(screen.getByPlaceholderText(/Ingrese su usuario/i), { target: { value: 'u2' } });
-    fireEvent.change(screen.getByPlaceholderText(/Ingrese su contraseña/i), { target: { value: 'p2' } });
-    fireEvent.click(screen.getByRole('button', { name: /Iniciar Sesión/i }));
+    const usuarioInput = screen.getByPlaceholderText(/Ingrese su usuario/i);
+    const passwordInput = screen.getByPlaceholderText(/Ingrese su contraseña/i);
+    const btn = screen.getByRole('button', { name: /Iniciar Sesión/i });
 
-    await waitFor(() => expect(doLogin).toHaveBeenCalledWith('u2', 'p2'));
-    vi.advanceTimersByTime(2000);
+    await user.type(usuarioInput, 'inve');
+    await user.type(passwordInput, 'inve');
+    await user.click(btn);
 
-    expect(navigateMock).toHaveBeenCalledWith('/Proyectos');
-    vi.useRealTimers();
+    await waitFor(() => expect(doLogin).toHaveBeenCalledWith('inve', 'inve'), { timeout: 3000 });
+    await waitFor(() => expect(checkRol).toHaveBeenCalled(), { timeout: 3000 });
+
+    await waitFor(() => {
+        expect(navigateMock).toHaveBeenCalledWith('/Proyectos');
+    }, { timeout: 4000 });
 });
 
 test('muestra modal de error cuando doLogin devuelve falsy', async () => {
+    
     doLogin.mockResolvedValue(false);
 
     render(<Login />);
