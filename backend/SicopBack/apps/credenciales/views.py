@@ -11,6 +11,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import logout, authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from datetime import timedelta
 
 
 class CredencialesViewSet(viewsets.ModelViewSet):
@@ -105,8 +107,47 @@ class RefreshFromCookieView(APIView):
             return Response({"detail": "No refresh token"}, status=status.HTTP_401_UNAUTHORIZED)
         try:
             token = RefreshToken(refresh_token)
-            new_access = str(token.access_token)
-            return Response({"access": new_access})
+
+            rotate = getattr(settings, 'SIMPLE_JWT', {}).get('ROTATE_REFRESH_TOKENS', False)
+            blacklist_after = getattr(settings, 'SIMPLE_JWT', {}).get('BLACKLIST_AFTER_ROTATION', False)
+
+            # Default: issue access from existing refresh
+            new_access_token = str(token.access_token)
+            response = Response({"access": new_access_token})
+
+            # If rotation is enabled, rotate and set a fresh refresh cookie (sliding session)
+            if rotate:
+                try:
+                    if blacklist_after:
+                        try:
+                            token.blacklist()
+                        except Exception:
+                            pass
+                    user_id = token.get('user_id')
+                    if user_id is not None:
+                        User = get_user_model()
+                        user = User.objects.filter(id=user_id).first()
+                        if user:
+                            new_refresh = RefreshToken.for_user(user)
+                            # new access derived from rotated refresh
+                            new_access_token = str(new_refresh.access_token)
+                            response = Response({"access": new_access_token})
+                            lifetime = getattr(settings, 'SIMPLE_JWT', {}).get('REFRESH_TOKEN_LIFETIME')
+                            max_age = int(lifetime.total_seconds()) if lifetime else 7*24*3600
+                            response.set_cookie(
+                                key='refresh',
+                                value=str(new_refresh),
+                                httponly=True,
+                                secure=not settings.DEBUG,
+                                samesite='Lax',
+                                max_age=max_age,
+                                path='/',
+                            )
+                except Exception:
+                    # if rotation fails, still return the non-rotated access above
+                    pass
+
+            return response
         except Exception:
             return Response({"detail": "Token inválido"}, status=status.HTTP_401_UNAUTHORIZED)
 

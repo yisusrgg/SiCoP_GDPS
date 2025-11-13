@@ -10,18 +10,27 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const init = async () => {
       try {
-        // try to refresh access using the refresh cookie first (works if cookie present)
+        // 1) Primero intenta check-auth; si ya hay access válido, evita un refresh innecesario
+        let resp;
         try {
-          await refreshAccess();
-        } catch (refreshErr) {
-          // refresh failed or no cookie; continue to check-auth which may return 401
-          // console.log('refresh failed at startup', refreshErr);
+          resp = await api.get('/credenciales/check-auth/');
+        } catch (e) {
+          resp = null;
         }
 
-        const resp = await api.get('/credenciales/check-auth/');
-        if (resp.data.is_authenticated) {
+        if (resp && resp.data?.is_authenticated) {
           setUser(resp.data.user);
-        } else {
+          return;
+        }
+
+        // 2) Si no hay sesión (o falló), intenta obtener access desde la cookie de refresh
+        try {
+          await refreshAccess();
+          // tras refrescar, vuelve a consultar check-auth
+          const resp2 = await api.get('/credenciales/check-auth/');
+          if (resp2.data?.is_authenticated) setUser(resp2.data.user);
+          else setUser(null);
+        } catch (refreshErr) {
           setUser(null);
         }
       } catch (err) {

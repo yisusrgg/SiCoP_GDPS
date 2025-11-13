@@ -33,6 +33,7 @@ import RegistroProyecto1 from "./pages/RegistroProyecto1";
 import RegistroProyecto2 from "./pages/RegistroProyecto2";
 import { RegistroProyectoProvider } from './components/Context';
 import Login from "./Login";
+import ConvocatoriasDetalle from './pages/Administrador/ConvocatoriasDetalle';
 //import ST from "./pages/students/StudentsList";
 // Prueba de subida a GitHub
 // Prueba de subida a GitHub
@@ -105,6 +106,11 @@ function App() {
                 </RequireRole>
               } />
 
+              <Route path="/Administracion/ConvocatoriasDetalle" element={
+                <RequireRole allowedRoles={["Administrador","Investigador"]}>
+                  <ConvocatoriasDetalle />
+                </RequireRole>
+              } />
 
               {/* INVESTIGADOR */}
               <Route path="/ConvocatoriasInvestigador" element={

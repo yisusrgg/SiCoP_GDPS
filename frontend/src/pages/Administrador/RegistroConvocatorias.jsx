@@ -220,9 +220,18 @@ export default function RegistroConvocatorias() {
                   variant="outlined"
                   fullWidth
                   InputLabelProps={{ shrink: true }}
-                  {...register("fechaFinConvocatoria", { required: true })}
+                  inputProps={{ min: watch("fechaInicioConvocatoria") || undefined }}
+                  {...register("fechaFinConvocatoria", {
+                    required: true,
+                    validate: (value) => {
+                      const inicio = watch("fechaInicioConvocatoria");
+                      if (!inicio || !value) return !!value || messages.req;
+                      const ok = new Date(value) >= new Date(inicio);
+                      return ok || "La fecha de fin no puede ser anterior al inicio de la convocatoria";
+                    },
+                  })}
                   error={!!errors.fechaFinConvocatoria}
-                  helperText={errors.fechaFinConvocatoria && messages.req}
+                  helperText={errors?.fechaFinConvocatoria?.message || (errors.fechaFinConvocatoria && messages.req)}
                 />
               </Grid>
 
@@ -252,9 +261,18 @@ export default function RegistroConvocatorias() {
                   variant="outlined"
                   fullWidth
                   InputLabelProps={{ shrink: true }}
-                  {...register("fechaFinFinanciamiento", { required: true })}
+                  inputProps={{ min: watch("fechaInicioFinanciamiento") || undefined }}
+                  {...register("fechaFinFinanciamiento", {
+                    required: true,
+                    validate: (value) => {
+                      const inicio = watch("fechaInicioFinanciamiento");
+                      if (!inicio || !value) return !!value || messages.req;
+                      const ok = new Date(value) >= new Date(inicio);
+                      return ok || "La fecha de fin no puede ser anterior al inicio del financiamiento";
+                    },
+                  })}
                   error={!!errors.fechaFinFinanciamiento}
-                  helperText={errors.fechaFinFinanciamiento && messages.req}
+                  helperText={errors?.fechaFinFinanciamiento?.message || (errors.fechaFinFinanciamiento && messages.req)}
                 />
               </Grid>
 

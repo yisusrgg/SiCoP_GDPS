@@ -57,7 +57,24 @@ export default function ConvocatoriasInvestigador({ user = { type: "Investigador
           areas: Array.isArray(item.areas) ? item.areas : item.areas ? [item.areas] : (item.lineas || []),
         }));
 
-        setConvocatorias(datos);
+        const parseDate = (v) => {
+          if (!v) return null;
+          const d = new Date(v);
+          return isNaN(d.getTime()) ? null : d;
+        };
+
+        const isInRange = (start, end) => {
+          const s = parseDate(start);
+          const e = parseDate(end);
+          if (!s || !e) return false;
+          const now = new Date();
+          return now >= s && now <= e;
+        };
+
+        // Filtrar solo las convocatorias cuyo rango de fechas incluya la fecha actual
+        const datosActivos = datos.filter((item) => isInRange(item.fechaInicio, item.fechaFin));
+
+        setConvocatorias(datosActivos);
         setActiveIndex(0);
       } catch (error) {
         console.error("Error al cargar las convocatorias: ", error);

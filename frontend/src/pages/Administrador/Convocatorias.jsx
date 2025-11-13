@@ -1,18 +1,34 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Grid, CssBaseline, Typography, Box, IconButton, Modal, Card, CardContent, Fade, Backdrop, Button, Chip, Divider } from "@mui/material";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { Grid, CssBaseline, Typography, Box, IconButton, Modal, Card, CardContent, Fade, Backdrop, Button, Chip, Divider, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Avatar, Collapse, Alert } from "@mui/material";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ConvocatoriasCard from "../../components/ConvocatoriasCard";
 import { useNavigate } from "react-router-dom";
 import SideBarAdmin from "../../components/SideBarAdmin";
-import { getAllConvocatorias } from "../../api/Convocatoria.api";
+import { getAllConvocatorias, deleteCall } from "../../api/Convocatoria.api";
 import CloseIcon from "@mui/icons-material/Close";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import DescriptionIcon from "@mui/icons-material/Description";
+import DeleteIcon from '@mui/icons-material/Delete';
+import AuthContext from '../../contexts/AuthContext';
 
 export default function Convocatorias({ user = { type: "Admin" } }) {
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+  const effectiveUser = user || auth?.user || null;
+  const isAdmin = (() => {
+    const u = effectiveUser;
+    if (!u) return false;
+    const roleCandidates = [u.type, u.Rol, u.role, u.rol, u.role_name];
+    for (const r of roleCandidates) {
+      if (!r) continue;
+      const rr = String(r).toLowerCase();
+      if (rr === 'administrador' || rr === 'admin') return true;
+    }
+    if (u.is_staff || u.is_superuser) return true;
+    return false;
+  })();
   const [convocatorias, setConvocatorias] = useState([]);
 
   const sliderRef = useRef(null);
@@ -23,6 +39,10 @@ export default function Convocatorias({ user = { type: "Admin" } }) {
   const [itemsPerView, setItemsPerView] = useState(3);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedConvocatoria, setSelectedConvocatoria] = useState(null);
+  const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [mensajeError, setMensajeError] = useState("");
+  const [openAlert, setOpenAlert] = useState(false);
 
   const handleOpenModal = (convocatoria) => {
     setSelectedConvocatoria(convocatoria);
@@ -32,6 +52,30 @@ export default function Convocatorias({ user = { type: "Admin" } }) {
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedConvocatoria(null);
+  };
+
+  const handleRequestDelete = () => {
+    if (!selectedConvocatoria) return;
+    setOpenConfirmDelete(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedConvocatoria) return;
+    try {
+      setDeleting(true);
+      await deleteCall(selectedConvocatoria.id);
+      // quitar de la lista local
+      setConvocatorias(prev => prev.filter(c => c.id !== selectedConvocatoria.id));
+      setOpenConfirmDelete(false);
+      handleCloseModal();
+    } catch (error) {
+      console.error('Error eliminando convocatoria:', error);
+      setMensajeError('No se pudo eliminar la convocatoria. Intente nuevamente.');
+      setOpenAlert(true);
+      setOpenConfirmDelete(false);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const buildArchivoUrl = (archivo) => {
@@ -61,7 +105,23 @@ export default function Convocatorias({ user = { type: "Admin" } }) {
           estado: item.estado || 'Activa',
           areas: Array.isArray(item.areas) ? item.areas : item.areas ? [item.areas] : (item.lineas || []),
         }));
-        setConvocatorias(datos);
+        const parseDate = (v) => {
+          if (!v) return null;
+          const d = new Date(v);
+          return isNaN(d.getTime()) ? null : d;
+        };
+
+        const isInRange = (start, end) => {
+          const s = parseDate(start);
+          const e = parseDate(end);
+          if (!s || !e) return false;
+          const now = new Date();
+          return now >= s && now <= e;
+        };
+
+        const datosActivos = datos.filter((item) => isInRange(item.fechaInicio, item.fechaFin));
+
+        setConvocatorias(datosActivos);
         setActiveIndex(0);
       } catch (err) {
         console.error("Error fetching convocatorias:", err);
@@ -138,7 +198,7 @@ export default function Convocatorias({ user = { type: "Admin" } }) {
           <SideBarAdmin />
         </nav>
       )}
-      <Box sx={{ flex: 1, padding: "20px", mt: 7, mb: 7, overflowX: "hidden", pb: { xs: 8, sm: 12 } }}>
+      <Box sx={{ flex: 1, padding: "20px", mt: 7, mb: 7, overflowX: 'visible', overflowY: 'visible', pb: { xs: 8, sm: 12 } }}>
         <Typography variant="h3" align="center" style={{ marginTop: "20px" }}>
           Convocatorias
         </Typography>
@@ -160,7 +220,7 @@ export default function Convocatorias({ user = { type: "Admin" } }) {
         </Box>
 
         <Box sx={{ display: 'flex', justifyContent: 'center', px: { xs: 1, sm: 4 }, py: 3 }}>
-          <Box ref={wrapperRef} sx={{ position: 'relative', width: '100%', maxWidth: 'min(1200px, 95vw)', mx: 'auto', overflow: 'visible', pb: { xs: 6, sm: 8 }, pt: 2 }}>
+          <Box ref={wrapperRef} sx={{ position: 'relative', width: '100%', maxWidth: 'min(1200px, 95vw)', mx: 'auto', overflow: 'visible', pb: { xs: 8, sm: 10 }, pt: 2 }}>
 
             {convocatorias.length > 0 && (
               <IconButton
@@ -227,12 +287,12 @@ export default function Convocatorias({ user = { type: "Admin" } }) {
             )}
 
             {convocatorias.length > 1 && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 1, pb: 1 }}>
                 {(() => {
                   const maxIndex = Math.max(0, convocatorias.length - itemsPerView);
                   const pages = maxIndex + 1;
                   return Array.from({ length: pages }).map((_, i) => (
-                    <Box key={i} onClick={() => setActiveIndex(i)} sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: i === activeIndex ? 'primary.main' : 'grey.300', mx: 0.5, cursor: 'pointer' }} />
+                    <Box key={i} onClick={() => setActiveIndex(i)} sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: i === activeIndex ? 'primary.main' : 'grey.300', mx: 0.75, cursor: 'pointer' }} />
                   ));
                 })()}
               </Box>
@@ -404,6 +464,17 @@ export default function Convocatorias({ user = { type: "Admin" } }) {
                         )}
 
                         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, pt: 2 }}>
+                          {isAdmin && (
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              startIcon={<DeleteIcon />}
+                              onClick={handleRequestDelete}
+                              sx={{ borderRadius: 2 }}
+                            >
+                              Eliminar
+                            </Button>
+                          )}
                           <Button
                             variant="outlined"
                             onClick={handleCloseModal}
@@ -435,6 +506,38 @@ export default function Convocatorias({ user = { type: "Admin" } }) {
                 </Box>
               </Fade>
             </Modal>
+            {/* Alert de error */}
+            <Collapse in={openAlert} sx={{ mt: 2 }}>
+              <Alert severity="error" onClose={() => setOpenAlert(false)}>{mensajeError}</Alert>
+            </Collapse>
+
+            {/* Diálogo de confirmación de eliminación */}
+            <Dialog
+              open={openConfirmDelete}
+              onClose={() => setOpenConfirmDelete(false)}
+              maxWidth="xs"
+              fullWidth
+              sx={{ zIndex: 2100 }}
+              PaperProps={{
+                sx: {
+                  borderRadius: 3,
+                  boxShadow: '0 12px 40px rgba(0,0,0,0.15)'
+                }
+              }}
+            >
+              <DialogTitle sx={{ textAlign: 'center', backgroundColor: '#d32f2f', color: 'white', fontWeight: 'bold' }}>Eliminar Convocatoria</DialogTitle>
+              <DialogContent sx={{ textAlign: 'center' }}>
+                <DialogContentText>
+                  ¿Está seguro de eliminar la convocatoria "{selectedConvocatoria?.convocatoria}"?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
+                <Button variant="outlined" onClick={() => setOpenConfirmDelete(false)}>Cancelar</Button>
+                <Button variant="contained" color="error" startIcon={<DeleteIcon />} disabled={deleting} onClick={confirmDelete}>
+                  {deleting ? 'Eliminando...' : 'Eliminar'}
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Box>
         </Box>
       </Box>
