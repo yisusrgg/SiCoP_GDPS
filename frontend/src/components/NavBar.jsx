@@ -1,11 +1,16 @@
 import { Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import React, { useEffect } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { logOut, checkRol, chechSession } from "../api/Credenciales.api.js";
+import AuthContext from "../contexts/AuthContext.jsx";
+import api from "../api/axiosInstance";
 
 export default function NavBar({ user }) {
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+  const currentUser = user || auth?.user;
+  const [displayName, setDisplayName] = useState(null);
 
   // FUNCION PARA EL MANEJO DEL CERRADO DE SESION
   const handleLogout = async () => {
@@ -50,6 +55,26 @@ export default function NavBar({ user }) {
     return () => clearInterval(interval); // Limpia el intervalo al desmontar el componente
   }, [navigate]);
 
+  // Cargar el nombre del usuario (desde contexto o check-auth)
+  useEffect(() => {
+    const loadName = async () => {
+      if (currentUser?.username || currentUser?.name) {
+        setDisplayName(currentUser.username || currentUser.name);
+        return;
+      }
+      try {
+        const resp = await api.get("/credenciales/check-auth/");
+        if (resp?.data?.is_authenticated) {
+          const u = resp.data.user || {};
+          setDisplayName(u.username || u.name || null);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    loadName();
+  }, [currentUser]);
+
   return (
     <nav
       className="navbar navbar-expand-lg"
@@ -90,11 +115,11 @@ export default function NavBar({ user }) {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              {user ? user.name : "Juan Perez"}
+              {displayName || currentUser?.username || currentUser?.name || "Usuario"}
             </a>
             <ul className="dropdown-menu">
               <li>
-                {!user ? (
+                {currentUser ? (
                   <div>
                     <Link className="dropdown-item" to={"/NoTerminada"}>
                       Mi perfil
