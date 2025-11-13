@@ -335,9 +335,11 @@ export default function Login() {
         sx={{
           flexGrow: 1,
           display: "flex",
-          alignItems: "center",
           justifyContent: "center",
           minHeight: "80vh",
+          alignItems: "flex-start",
+          mt: 0,
+          pt: 1, 
         }}
       >
         <Container maxWidth="md">

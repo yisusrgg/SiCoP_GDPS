@@ -1,3 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+  --font-family: 'Inter', 'Roboto', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  --primary-color: #1B396A;
+  --primary-contrast: #ffffff;
+  --text-color: #222222;
+  --muted-color: #6c757d;
+}
+
+:root {
+  --primary-light: #e9f1fe; 
+  --primary-main: var(--primary-color);
+  --primary-dark: #12284a;
+  --success-main: #2e7d32;
+  --error-main: #d32f2f;
+  --info-main: #0288d1;
+  --surface: #ffffff;
+  --elev-1: 0 1px 3px rgba(16,24,40,0.06);
+  --elev-2: 0 6px 18px rgba(16,24,40,0.08);
+}
+
+
+html, body, #root {
+  height: 100%;
+}
+
 body {
   margin: 0;
+  font-family: var(--font-family);
+  color: var(--text-color);
+  background-color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+.app-navbar {
+  background-color: var(--primary-color) !important;
+  color: var(--primary-contrast) !important;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  z-index: 1300;
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .nav-link,
+.app-navbar .dropdown-item {
+  color: var(--primary-contrast) !important;
+}
+
+body, button, input, select, textarea {
+  font-size: 14px;
+}
+
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.muted {
+  color: var(--muted-color) !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family);
+  color: var(--text-color);
+  margin: 0 0 0.5rem 0;
+}
+
+h1 { font-size: 2.125rem; font-weight: 700; }
+h2 { font-size: 1.5rem; font-weight: 600; }
+h3 { font-size: 1.25rem; font-weight: 600; }
+
+.btn {
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  line-height: 1.75;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--primary-main);
+}
+
+.btn:focus { outline: none; box-shadow: 0 0 0 3px rgba(27,57,106,0.12); }
+
+.btn-link {
+  background: transparent;
+  color: var(--primary-main);
+  padding: 0;
+  text-decoration: underline;
+}
+
+.btn-contained {
+  background: var(--primary-main);
+  color: var(--primary-contrast);
+  box-shadow: var(--elev-1);
+}
+
+.btn-outlined {
+  background: transparent;
+  color: var(--primary-main);
+  border: 1px solid rgba(27,57,106,0.12);
+}
+
+.MuiCard-root {
+  border-radius: 12px !important;
+  box-shadow: var(--elev-2) !important;
+  background-color: var(--surface) !important;
+}
+
+.MuiCardHeader-root {
+  background-color: var(--primary-light) !important;
+  padding: 8px 16px !important;
+}
+
+.MuiCardContent-root {
+  padding: 16px !important;
+}
+
+.MuiTypography-root {
+  font-family: var(--font-family) !important;
+}
+
+.MuiButton-root {
+  border-radius: 8px !important;
+  text-transform: none !important; 
+}
+
+.MuiButton-containedPrimary {
+  background-color: var(--primary-main) !important;
+  color: var(--primary-contrast) !important;
+}
+
+.MuiButton-containedPrimary:hover {
+  background-color: var(--primary-dark) !important;
+}
+
+.MuiIconButton-root {
+  transition: transform 0.12s ease, background-color 0.12s ease;
+}
+
+.MuiIconButton-root:hover {
+  transform: scale(1.03);
+}
+
+.MuiChip-root {
+  font-weight: 600;
+}
+
+.MuiBackdrop-root {
+  background-color: rgba(0,0,0,0.45) !important;
+}
+
+.MuiPaper-root {
+  border-radius: 12px !important;
+}
+
+.text-muted { color: var(--muted-color) !important; }
+.card-elev { box-shadow: var(--elev-1); border-radius: 10px; }
+
+/* Reduce visual noise en scrollables (especialmente sliders) */
+::-webkit-scrollbar { height: 8px; width: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 8px; }
+
+/* Responsive tweaks para evitar que el nav fijo tape contenido */
+main, #root, .app-root { padding-top: 68px; }
+
